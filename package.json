@@ -1,0 +1,11 @@
+{
+  "name": "whichcostsmore",
+  "version": "1.0.0",
+  "devDependencies": {
+    "prettier": "latest"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
+}

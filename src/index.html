@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Which Card Costs More?</title>
+    <meta charset="utf-8" lang="en" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="connect-src 'self' *.scryfall.com"
+    />
+    <link rel="stylesheet" href="./main.css" />
+    <script src="./main.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>
+        Which card costs more <span id="mode-toggle" class="coin"></span
+        ><span class="hint"
+          >click to swap currency <span class="hint-arrow">↝</span></span
+        >?
+      </h1>
+      <div class="row">
+        <div class="col">
+          <figure id="card-0" class="card">
+            <img src="" alt="&nbsp;" draggable="false" />
+          </figure>
+          <div id="prices-0" class="prices">
+            <div><span class="coin"></span><span class="price">0.00</span></div>
+          </div>
+        </div>
+        <div class="col">
+          <figure id="card-1" class="card">
+            <img src="" alt="&nbsp;" draggable="false" />
+          </figure>
+          <div id="prices-1" class="prices">
+            <div><span class="coin"></span><span class="price">0.00</span></div>
+          </div>
+        </div>
+      </div>
+      <button id="reset-btn" class="hidden">Draw Again!</button>
+      <div id="result-list" class="hidden">
+        <div class="list-body"></div>
+      </div>
+    </main>
+    <footer>
+      <span id="copyright"
+        >© 2023 <a href="https://ko-fi.com/squirrelbat">squirrel-bat</a></span
+      >
+      <p id="fan-content-policy">
+        "Which Card Costs More?" is unofficial Fan Content permitted under the
+        <a
+          href="https://company.wizards.com/en/legal/fancontentpolicy"
+          target="_blank"
+          >Fan Content Policy</a
+        >. Not approved/endorsed by Wizards.<br />Portions of the materials used
+        are property of Wizards of the Coast. © Wizards of the Coast LLC.
+      </p>
+    </footer>
+  </body>
+</html>
