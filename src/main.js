@@ -127,6 +127,7 @@ function answer(id) {
 
 function addResultListItem(result) {
   const a = document.createElement('a')
+  a.target = '_blank'
   a.href = result.url
   a.innerText = result.name
   const span = document.createElement('span')
