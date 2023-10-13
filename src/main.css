@@ -187,7 +187,8 @@ h1 {
     topple 8s infinite cubic-bezier(0.7, 0, 0.84, 0);
 }
 .card:after {
-  content: 'Loading...';
+  content: 'Loading\a from Scryfall...';
+  white-space: pre;
   font-weight: bold;
   position: absolute;
   top: calc(50% + 2rem);
@@ -455,6 +456,7 @@ button:active {
 .list-item a {
   color: inherit;
   padding-left: 0.5rem;
+  position: relative;
 }
 
 main {
