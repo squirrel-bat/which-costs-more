@@ -20,10 +20,9 @@ updateMode()
 
 function updateMode() {
   const currency = Object.keys(MODES).at(MODE)
-  document.documentElement.style.setProperty(
-    '--mode',
-    '"' + MODES[currency] + '"',
-  )
+  document
+    .querySelector(':root')
+    .style.setProperty('--mode', '"' + MODES[currency] + '"')
   renderPrices()
 }
 function toggleMode() {
@@ -56,8 +55,7 @@ function loadCard(id = 0) {
         !card.hasOwnProperty('prices')
       ) {
         console.log('Card is missing data, fetching new one...')
-        setTimeout(() => loadCard(id), 100)
-        return
+        return loadCard(id)
       }
       CARD_DATA[id] = card
       img.alt = card.name
