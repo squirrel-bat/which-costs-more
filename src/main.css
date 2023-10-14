@@ -507,3 +507,13 @@ main {
     font-size: 0.4rem;
   }
 }
+
+#cheat-btn {
+  display: none;
+  margin-bottom: 2rem;
+}
+@media (hover: none) {
+  #cheat-btn {
+    display: revert;
+  }
+}

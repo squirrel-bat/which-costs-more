@@ -239,8 +239,14 @@ function handleKeys(e) {
   }
 }
 
+function cheat() {
+  THE_CODE.active = true
+  renderPrices()
+}
+
 window.addEventListener('keydown', handleKeys)
 window.onload = () => {
+  document.getElementById('cheat-btn').addEventListener('click', cheat)
   updateMode()
   setup()
 }
