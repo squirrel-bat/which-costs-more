@@ -1,3 +1,19 @@
+const THE_CODE = {
+  active: false,
+  pos: 0,
+  code: [
+    'ArrowUp',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowRight',
+    'b',
+    'a',
+  ],
+}
 const API_URL =
   'https://api.scryfall.com/cards/random?q=usd%3E%3D0.01+eur%3E%3D0.01+game%3Dpaper+is%3Anonfoil'
 const IMG_SIZE = 'normal'
@@ -16,7 +32,6 @@ const MODES = {
   eur: '€',
 }
 let MODE = 0
-updateMode()
 
 function updateMode() {
   const currency = Object.keys(MODES).at(MODE)
@@ -99,6 +114,15 @@ function renderPrices() {
     if (!card.hasOwnProperty('prices')) return
     const field = document.getElementById('prices-' + i).querySelector('.price')
     field.textContent = card.prices[Object.keys(MODES).at(MODE)]
+    const cheatPrices = document.getElementById('cheat-prices-' + i)
+    Object.keys(MODES).forEach((currency) => {
+      cheatPrices.querySelector('.' + currency + ' .cheat-price').innerText =
+        card.prices[currency]
+    })
+    if (THE_CODE.active)
+      document
+        .getElementById('cheat-data')
+        .classList.remove('display-none', 'hidden')
   })
 }
 
@@ -174,6 +198,7 @@ function reset() {
     e.classList.remove(...Object.values(RESULT_STATUSES))
     e.querySelector('img').src = ''
   })
+  document.getElementById('cheat-data').classList.add('hidden')
   setup()
 }
 
@@ -184,7 +209,38 @@ function setup() {
     .then(() => loadCard(1))
     .then(() => {
       activateAnswers()
+      renderPrices()
     })
 }
 
-window.onload = setup
+function handleKeys(e) {
+  THE_CODE.pos = e.key === THE_CODE.code[THE_CODE.pos] ? THE_CODE.pos + 1 : 0
+  if (THE_CODE.pos === THE_CODE.code.length) {
+    if (!THE_CODE.active) {
+      const cheatInfo = document.createElement('span')
+      cheatInfo.id = 'cheatmode'
+      cheatInfo.innerText = 'Cheat Mode Activated!'
+      document.getElementById('title').prepend(cheatInfo)
+      Object.keys(MODES).forEach((key) =>
+        document
+          .querySelectorAll('.' + key)
+          .forEach((item) =>
+            item.style.setProperty(
+              '--mode',
+              '"' + MODES[key] + '"',
+              'important',
+            ),
+          ),
+      )
+    }
+    THE_CODE.active = true
+    renderPrices()
+    window.removeEventListener('keydown', handleKeys)
+  }
+}
+
+window.addEventListener('keydown', handleKeys)
+window.onload = () => {
+  updateMode()
+  setup()
+}

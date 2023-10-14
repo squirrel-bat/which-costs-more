@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self' *.scryfall.com *.scryfall.io; script-src 'self' 'unsafe-inline';"
+      content="default-src 'self' *.scryfall.com *.scryfall.io; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
     />
     <link
       rel="apple-touch-icon"
@@ -31,7 +31,7 @@
   </head>
   <body>
     <main>
-      <h1>
+      <h1 id="title">
         Which card costs more <span id="mode-toggle" class="coin"></span
         ><span class="hint"
           >click to swap currency <span class="hint-arrow">↝</span></span
@@ -52,6 +52,28 @@
           </figure>
           <div id="prices-1" class="prices">
             <div><span class="coin"></span><span class="price">0.00</span></div>
+          </div>
+        </div>
+      </div>
+      <div id="cheat-data" class="row display-none">
+        <div class="col">
+          <div id="cheat-prices-0" class="price-row">
+            <div class="usd">
+              <span class="coin"></span><span class="cheat-price">0.00</span>
+            </div>
+            <div class="eur">
+              <span class="coin"></span><span class="cheat-price">0.00</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div id="cheat-prices-1" class="price-row">
+            <div class="usd">
+              <span class="coin"></span><span class="cheat-price">0.00</span>
+            </div>
+            <div class="eur">
+              <span class="coin"></span><span class="cheat-price">0.00</span>
+            </div>
           </div>
         </div>
       </div>

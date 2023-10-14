@@ -42,6 +42,7 @@
     var(--purple-red-dark),
     var(--purple-red)
   );
+  --fade-in-default: fade-in 400ms ease-out;
 }
 *,
 *:before,
@@ -82,7 +83,7 @@ a {
 a:hover {
   text-decoration: underline;
 }
-h1 {
+#title {
   position: relative;
   display: inline-block;
   font-size: 5rem;
@@ -112,7 +113,7 @@ h1 {
   translate: -50% 90%;
   font-size: 1.5rem;
   color: var(--gold-light);
-  animation: fade-in 400ms ease-out;
+  animation: var(--fade-in-default);
 }
 .hint-arrow {
   display: inline-block;
@@ -121,6 +122,34 @@ h1 {
 }
 #mode-toggle:not(.active) + .hint {
   display: none;
+}
+#cheatmode {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  translate: 20% 90%;
+  font-size: 1.5rem;
+  color: var(--red);
+  animation: var(--fade-in-default);
+}
+#cheat-data {
+  font-family: 'Young Serif', serif;
+  font-size: 2rem;
+  text-shadow: var(--text-shadow-default);
+  animation: var(--fade-in-default);
+  transition: opacity 200ms;
+}
+.price-row {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 1rem;
+  padding: 0.75rem 0;
+  background: var(--black-20);
+  border-radius: 1rem;
+}
+.price-row .coin {
+  vertical-align: middle;
+  margin-right: 0.5rem;
 }
 .row {
   display: flex;
@@ -259,7 +288,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active img {
   text-shadow: var(--text-shadow-default);
   border-radius: var(--card-border-radius);
   background: var(--black-50);
-  animation: fade-in 400ms ease-out;
+  animation: var(--fade-in-default);
 }
 .success:after {
   content: '✔' !important;
@@ -293,7 +322,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active img {
   text-shadow: 0 0.03em var(--brown-50);
   background: var(--gold);
   filter: drop-shadow(0 0.05rem 0.1rem var(--black-75));
-  animation: fade-in 400ms ease-out;
+  animation: var(--fade-in-default);
 }
 .prices:before {
   content: '';
@@ -358,7 +387,7 @@ button {
   background: var(--blue-dark);
   box-shadow: 0 0.4rem 0 var(--grey-dark);
   transform-origin: bottom center;
-  transition: all 0.15s ease-out;
+  transition: all 150ms ease-out;
 }
 button:hover {
   translate: 0 0.2rem;
@@ -375,6 +404,7 @@ button:active {
 }
 
 #result-list {
+  transition: opacity 200ms;
   position: relative;
   display: block;
   max-width: calc(var(--max-content-width) / 2);
@@ -449,6 +479,7 @@ button:active {
   padding: 0 0.5rem;
   border-bottom: 0.15rem solid var(--blue);
   font-size: 2rem;
+  animation: var(--fade-in-default);
 }
 .list-item:first-child {
   border-top: 0.15rem solid var(--blue);
@@ -464,7 +495,11 @@ main {
 }
 
 .hidden {
-  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.display-none {
+  display: none;
 }
 
 @media screen and (max-device-width: 640px) {
