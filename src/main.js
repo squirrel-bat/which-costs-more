@@ -14,9 +14,8 @@ const THE_CODE = {
     'a',
   ],
 }
-const API_URL =
-  'https://api.scryfall.com/cards/random?q=usd%3E%3D0.01+eur%3E%3D0.01+game%3Dpaper+is%3Anonfoil'
-const IMG_SIZE = 'normal'
+const FILE_URI = './data.gzip'
+let DATA = []
 const CARD_DATA = []
 const RESULTS = []
 const STATUS_SUCCESS = 'success'
@@ -46,10 +45,23 @@ function toggleMode() {
   updateMode()
 }
 
-async function getRandomCard() {
-  return await fetch(API_URL).then((r) => {
-    return r.json()
+async function getBulkData() {
+  return await fetch(FILE_URI, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'no-cors',
   })
+    .then((res) => res.blob())
+    .then((blob) => blob.stream())
+    .then((compressedStream) =>
+      compressedStream.pipeThrough(new DecompressionStream('gzip')),
+    )
+    .then((stream) => new Response(stream).json())
+}
+
+function getRandomCard() {
+  const index = Math.floor(Math.random() * DATA.length)
+  return DATA[index]
 }
 
 function replayAnimations(element) {
@@ -62,23 +74,12 @@ function replayAnimations(element) {
 function loadCard(id = 0) {
   const element = document.getElementById('card-' + id)
   const img = element.querySelector('img')
-  img.src = ''
-  return getRandomCard()
-    .then((card) => {
-      if (
-        !card.hasOwnProperty('image_uris') ||
-        !card.hasOwnProperty('prices')
-      ) {
-        console.log('Card is missing data, fetching new one...')
-        return loadCard(id)
-      }
-      CARD_DATA[id] = card
-      img.alt = card.name
-      img.src = card.image_uris[IMG_SIZE]
-      img.addEventListener('click', () => answer(id))
-      replayAnimations(element)
-    })
-    .catch(console.error)
+  const card = getRandomCard()
+  CARD_DATA[id] = card
+  img.alt = card.name
+  img.src = card['img_uri']
+  img.addEventListener('click', () => answer(id))
+  replayAnimations(element)
 }
 
 function cardsLoaded() {
@@ -205,15 +206,12 @@ function reset() {
 function setup() {
   activateModeToggle()
   loadCard(0)
-    // might have to insert a timeout between these to stay above the minimum delay for calls to the Scryfall API
-    .then(() => loadCard(1))
-    .then(() => {
-      activateAnswers()
-      renderPrices()
-    })
+  loadCard(1)
+  activateAnswers()
+  renderPrices()
 }
 
-function handleKeys(e) {
+function handleTheCode(e) {
   THE_CODE.pos = e.key === THE_CODE.code[THE_CODE.pos] ? THE_CODE.pos + 1 : 0
   if (THE_CODE.pos === THE_CODE.code.length) {
     if (!THE_CODE.active) {
@@ -235,7 +233,7 @@ function handleKeys(e) {
     }
     THE_CODE.active = true
     renderPrices()
-    window.removeEventListener('keydown', handleKeys)
+    window.removeEventListener('keydown', handleTheCode)
   }
 }
 
@@ -244,9 +242,12 @@ function cheat() {
   renderPrices()
 }
 
-window.addEventListener('keydown', handleKeys)
+window.addEventListener('keydown', handleTheCode)
 window.onload = () => {
-  document.getElementById('cheat-btn').addEventListener('click', cheat)
-  updateMode()
-  setup()
+  getBulkData().then((bulkData) => {
+    DATA = bulkData
+    document.getElementById('cheat-btn').addEventListener('click', cheat)
+    updateMode()
+    setup()
+  })
 }
