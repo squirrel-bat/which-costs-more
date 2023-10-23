@@ -108,7 +108,8 @@ function evaulateAnswer(id) {
     status:
       Number(selectedCard.prices[currency]) > Number(otherCard.prices[currency])
         ? STATUS_SUCCESS
-        : selectedCard.prices[currency] === otherCard.prices[currency]
+        : Number(selectedCard.prices[currency]) ===
+          Number(otherCard.prices[currency])
         ? STATUS_DRAW
         : STATUS_FAILURE,
   }

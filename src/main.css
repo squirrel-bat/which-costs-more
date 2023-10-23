@@ -515,7 +515,7 @@ kbd.key {
   align-self: center;
   z-index: 99;
   position: absolute;
-  top: 30%;
+  top: 33%;
   left: 50%;
   translate: -50% -50%;
   aspect-ratio: 1/1.1;
