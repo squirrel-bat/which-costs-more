@@ -7,12 +7,20 @@
     transform: scale(115%);
   }
 }
-@keyframes rotate {
+@keyframes rotateY {
   0% {
     rotate: y 0turn;
   }
   90% {
     rotate: y 8turn;
+  }
+}
+@keyframes rotateZ {
+  0% {
+    rotate: z 0turn;
+  }
+  100% {
+    rotate: z 1turn;
   }
 }
 @keyframes topple {
@@ -62,5 +70,17 @@
   }
   100% {
     opacity: 1;
+  }
+}
+@keyframes notify-shake {
+  0%,
+  10% {
+    transform: translate(0, 0);
+  }
+  3.3% {
+    transform: translate(0, -5%);
+  }
+  6.6% {
+    transform: translate(0, 5%);
   }
 }

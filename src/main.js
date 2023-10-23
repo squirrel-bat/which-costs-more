@@ -14,9 +14,8 @@ const THE_CODE = {
     'a',
   ],
 }
-const API_URL =
-  'https://api.scryfall.com/cards/random?q=usd%3E%3D0.01+eur%3E%3D0.01+game%3Dpaper+is%3Anonfoil'
-const IMG_SIZE = 'normal'
+const FILE_URI = './data.gzip'
+let DATA = []
 const CARD_DATA = []
 const RESULTS = []
 const STATUS_SUCCESS = 'success'
@@ -46,10 +45,27 @@ function toggleMode() {
   updateMode()
 }
 
-async function getRandomCard() {
-  return await fetch(API_URL).then((r) => {
-    return r.json()
+async function getBulkData() {
+  return await fetch(FILE_URI, {
+    method: 'GET',
+    credentials: 'include',
+    mode: 'no-cors',
   })
+    .then((res) => res.blob())
+    .then((blob) => blob.stream())
+    .then((compressedStream) =>
+      compressedStream.pipeThrough(new DecompressionStream('gzip')),
+    )
+    .then((stream) => new Response(stream).json())
+}
+
+function getRandomCardIndex(butNotThisOne = null) {
+  const index = Math.floor(Math.random() * DATA.length)
+  if (index === butNotThisOne) {
+    console.log("We hit the same index twice!? Let's try that again.")
+    return getRandomCardIndex(butNotThisOne)
+  }
+  return index
 }
 
 function replayAnimations(element) {
@@ -59,26 +75,17 @@ function replayAnimations(element) {
   })
 }
 
-function loadCard(id = 0) {
+function loadCard(id = 0, butNotThatIndex) {
   const element = document.getElementById('card-' + id)
   const img = element.querySelector('img')
-  img.src = ''
-  return getRandomCard()
-    .then((card) => {
-      if (
-        !card.hasOwnProperty('image_uris') ||
-        !card.hasOwnProperty('prices')
-      ) {
-        console.log('Card is missing data, fetching new one...')
-        return loadCard(id)
-      }
-      CARD_DATA[id] = card
-      img.alt = card.name
-      img.src = card.image_uris[IMG_SIZE]
-      img.addEventListener('click', () => answer(id))
-      replayAnimations(element)
-    })
-    .catch(console.error)
+  const index = getRandomCardIndex(butNotThatIndex)
+  const card = DATA[index]
+  CARD_DATA[id] = card
+  img.alt = card.name
+  img.src = card['img_uri']
+  img.addEventListener('click', () => answer(id))
+  replayAnimations(element)
+  return index
 }
 
 function cardsLoaded() {
@@ -101,7 +108,8 @@ function evaulateAnswer(id) {
     status:
       Number(selectedCard.prices[currency]) > Number(otherCard.prices[currency])
         ? STATUS_SUCCESS
-        : selectedCard.prices[currency] === otherCard.prices[currency]
+        : Number(selectedCard.prices[currency]) ===
+          Number(otherCard.prices[currency])
         ? STATUS_DRAW
         : STATUS_FAILURE,
   }
@@ -144,7 +152,7 @@ function answer(id) {
   showResults(id, result)
   document.getElementById('result-list').classList.remove('hidden')
   addResultListItem(result)
-  activateResetButton()
+  setTimeout(activateResetButton, 500)
 }
 
 function addResultListItem(result) {
@@ -204,16 +212,13 @@ function reset() {
 
 function setup() {
   activateModeToggle()
-  loadCard(0)
-    // might have to insert a timeout between these to stay above the minimum delay for calls to the Scryfall API
-    .then(() => loadCard(1))
-    .then(() => {
-      activateAnswers()
-      renderPrices()
-    })
+  const firstCardIndex = loadCard(0)
+  loadCard(1, firstCardIndex)
+  activateAnswers()
+  renderPrices()
 }
 
-function handleKeys(e) {
+function handleTheCode(e) {
   THE_CODE.pos = e.key === THE_CODE.code[THE_CODE.pos] ? THE_CODE.pos + 1 : 0
   if (THE_CODE.pos === THE_CODE.code.length) {
     if (!THE_CODE.active) {
@@ -235,7 +240,7 @@ function handleKeys(e) {
     }
     THE_CODE.active = true
     renderPrices()
-    window.removeEventListener('keydown', handleKeys)
+    window.removeEventListener('keydown', handleTheCode)
   }
 }
 
@@ -244,9 +249,45 @@ function cheat() {
   renderPrices()
 }
 
-window.addEventListener('keydown', handleKeys)
+function handleKeyDown(e) {
+  if (e.key === 'Shift') {
+    document
+      .querySelectorAll('kbd.key')
+      .forEach((item) => item.classList.remove('display-none'))
+  }
+}
+function handleKeyUp(e) {
+  switch (e.key) {
+    case 'Shift':
+      document
+        .querySelectorAll('kbd.key')
+        .forEach((item) => item.classList.add('display-none'))
+      break
+    case 'c':
+      document
+        .querySelector('#mode-toggle')
+        .dispatchEvent(new Event('mousedown'))
+      break
+    case '1':
+      document.querySelector('#card-0 img').click()
+      break
+    case '2':
+      document.querySelector('#card-1 img').click()
+      break
+    case 'Enter':
+      document.querySelector('#reset-btn').click()
+      break
+  }
+}
+
 window.onload = () => {
-  document.getElementById('cheat-btn').addEventListener('click', cheat)
-  updateMode()
-  setup()
+  getBulkData().then((bulkData) => {
+    DATA = bulkData
+    window.addEventListener('keydown', handleTheCode)
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    document.getElementById('cheat-btn').addEventListener('click', cheat)
+    updateMode()
+    setup()
+  })
 }
