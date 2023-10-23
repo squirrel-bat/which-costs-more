@@ -250,11 +250,23 @@ function cheat() {
 }
 
 function handleKeyDown(e) {
+  if (e.key === 'Shift') {
+    document
+      .querySelectorAll('kbd.key')
+      .forEach((item) => item.classList.remove('display-none'))
+  }
+}
+function handleKeyUp(e) {
   switch (e.key) {
     case 'Shift':
       document
         .querySelectorAll('kbd.key')
-        .forEach((item) => item.classList.remove('display-none'))
+        .forEach((item) => item.classList.add('display-none'))
+      break
+    case 'c':
+      document
+        .querySelector('#mode-toggle')
+        .dispatchEvent(new Event('mousedown'))
       break
     case '1':
       document.querySelector('#card-0 img').click()
@@ -266,12 +278,6 @@ function handleKeyDown(e) {
       document.querySelector('#reset-btn').click()
       break
   }
-}
-function handleKeyUp(e) {
-  if (e.key === 'Shift')
-    document
-      .querySelectorAll('kbd.key')
-      .forEach((item) => item.classList.add('display-none'))
 }
 
 window.onload = () => {
