@@ -5,6 +5,7 @@ import requests
 
 HR = "\n" + ("-" * shutil.get_terminal_size().columns) + "\n"
 API_URL = "https://api.scryfall.com/bulk-data/default-cards"
+OUTPUT_FILE = "data.gzip"
 
 
 def get_bulk_json():
@@ -38,7 +39,7 @@ def parse_data(data_json):
     if len(card_data) == 0:
         return
     json_data = json.dumps(card_data)
-    with gzip.open("../src/data.gzip", "w") as fp:
+    with gzip.open(OUTPUT_FILE, "w") as fp:
         fp.write(json_data.encode("utf-8"))
         fp.close()
     print(f"Ported:  {len(card_data)}")
