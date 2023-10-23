@@ -37,11 +37,14 @@
   <body>
     <main>
       <h1 id="title">
-        Which card costs more <span id="mode-toggle" class="coin"></span
-        ><span class="hint"
-          >click to swap currency <span class="hint-arrow">↝</span></span
-        >?
+        Which card costs more <span id="mode-toggle" class="coin"></span>?
+        <span class="hint">
+          click to swap currency <span class="hint-arrow">↝</span>
+        </span>
       </h1>
+      <span class="hint hint-controls">
+        Hold <kbd>[Shift]</kbd> to see keyboard controls
+      </span>
       <div class="row">
         <div class="col">
           <figure id="card-0" class="card">
@@ -50,6 +53,7 @@
           <div id="prices-0" class="prices">
             <div><span class="coin"></span><span class="price">0.00</span></div>
           </div>
+          <kbd class="key display-none" style="--key: '1'"></kbd>
         </div>
         <div class="col">
           <figure id="card-1" class="card">
@@ -58,6 +62,7 @@
           <div id="prices-1" class="prices">
             <div><span class="coin"></span><span class="price">0.00</span></div>
           </div>
+          <kbd class="key display-none" style="--key: '2'"></kbd>
         </div>
       </div>
       <div id="cheat-data" class="row display-none">
@@ -82,7 +87,10 @@
           </div>
         </div>
       </div>
-      <button id="reset-btn" class="hidden">Draw Again!</button>
+      <div id="reset-btn-container">
+        <button id="reset-btn" class="hidden">Draw Again!</button>
+        <kbd class="key enter display-none" style="--key: '↵ Enter'"></kbd>
+      </div>
       <div id="result-list" class="hidden">
         <div class="list-body"></div>
       </div>

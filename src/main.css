@@ -74,6 +74,9 @@ body {
   padding: 1rem;
   color: var(--black-50);
 }
+kbd {
+  font-weight: normal;
+}
 a {
   text-decoration: none;
   color: var(--gold-light);
@@ -106,12 +109,14 @@ a:hover {
 }
 .hint {
   font-size: 1.5rem;
+  font-weight: bold;
   position: absolute;
   right: 0;
   bottom: 0;
   animation: var(--fade-in-default);
   color: var(--gold-light);
   translate: -50% 90%;
+  text-shadow: var(--text-shadow-default);
 }
 .hint-arrow {
   display: inline-block;
@@ -120,6 +125,11 @@ a:hover {
 }
 #mode-toggle:not(.active) + .hint {
   display: none;
+}
+.hint-controls {
+  position: fixed;
+  translate: -2% 0;
+  z-index: -1;
 }
 #cheatmode {
   font-size: 1.5rem;
@@ -207,7 +217,7 @@ a:hover {
   display: flex;
   content: var(--mode);
   animation:
-    rotate 8s infinite cubic-bezier(0, 0.5, 0.5, 1),
+    rotateY 8s infinite cubic-bezier(0, 0.5, 0.5, 1),
     drop 8s infinite linear,
     topple 8s infinite cubic-bezier(0.7, 0, 0.84, 0);
 
@@ -397,7 +407,8 @@ button:active {
   translate: 0 0.4rem;
   filter: none;
 }
-#reset-btn {
+#reset-btn-container {
+  position: relative;
   margin: 1.35em auto;
 }
 
@@ -500,6 +511,71 @@ main {
   display: none;
 }
 
+kbd.key {
+  align-self: center;
+  z-index: 99;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  translate: -50% -50%;
+  aspect-ratio: 1/1.1;
+  font-size: 1.2rem;
+  height: 4rem;
+  width: auto;
+  padding: 0.2rem 0.7rem 0.8rem 0.3rem;
+  background: linear-gradient(
+    to bottom right,
+    var(--white),
+    var(--grey) 45%,
+    var(--grey-dark) 200%
+  );
+  color: var(--black);
+  border-radius: 0.5rem;
+
+  animation: notify-shake 3s infinite;
+
+  transform-style: preserve-3d;
+}
+kbd.key:before {
+  content: var(--key);
+  white-space: nowrap;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  height: 100%;
+  width: 100%;
+  padding: 0.4rem;
+  background: linear-gradient(to right, var(--grey), var(--white));
+  border-radius: 0.3rem;
+  outline: 0.1rem solid var(--grey);
+}
+kbd.key:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  height: 0;
+  width: 0;
+  translate: -50% -50% -1px;
+
+  box-shadow:
+    0 0 2rem 2.5rem var(--gold-light),
+    0 0 5rem 5rem var(--gold-dark);
+
+  animation: rotateZ 3s infinite;
+}
+kbd.key.enter {
+  top: 50%;
+}
+kbd.key.enter:before {
+  align-items: center;
+  padding-right: 2rem;
+}
+#reset-btn.hidden + kbd.key.enter {
+  display: none !important;
+}
+
 @media screen and (max-device-width: 640px) {
   html {
     font-size: 0.4rem;
@@ -513,5 +589,8 @@ main {
 @media (hover: none) {
   #cheat-btn {
     display: revert;
+  }
+  .hint-controls {
+    display: none;
   }
 }

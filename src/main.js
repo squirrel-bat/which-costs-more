@@ -151,7 +151,7 @@ function answer(id) {
   showResults(id, result)
   document.getElementById('result-list').classList.remove('hidden')
   addResultListItem(result)
-  activateResetButton()
+  setTimeout(activateResetButton, 500)
 }
 
 function addResultListItem(result) {
@@ -248,10 +248,37 @@ function cheat() {
   renderPrices()
 }
 
-window.addEventListener('keydown', handleTheCode)
+function handleKeyDown(e) {
+  switch (e.key) {
+    case 'Shift':
+      document
+        .querySelectorAll('kbd.key')
+        .forEach((item) => item.classList.remove('display-none'))
+      break
+    case '1':
+      document.querySelector('#card-0 img').click()
+      break
+    case '2':
+      document.querySelector('#card-1 img').click()
+      break
+    case 'Enter':
+      document.querySelector('#reset-btn').click()
+      break
+  }
+}
+function handleKeyUp(e) {
+  if (e.key === 'Shift')
+    document
+      .querySelectorAll('kbd.key')
+      .forEach((item) => item.classList.add('display-none'))
+}
+
 window.onload = () => {
   getBulkData().then((bulkData) => {
     DATA = bulkData
+    window.addEventListener('keydown', handleTheCode)
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
     document.getElementById('cheat-btn').addEventListener('click', cheat)
     updateMode()
     setup()
