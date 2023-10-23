@@ -48,7 +48,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: data_file
-          path: './src/data.gzip'
+          path: './src'
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
