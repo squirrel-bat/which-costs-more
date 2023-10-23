@@ -59,9 +59,13 @@ async function getBulkData() {
     .then((stream) => new Response(stream).json())
 }
 
-function getRandomCard() {
+function getRandomCardIndex(butNotThisOne = null) {
   const index = Math.floor(Math.random() * DATA.length)
-  return DATA[index]
+  if (index === butNotThisOne) {
+    console.log("We hit the same index twice!? Let's try that again.")
+    return getRandomCardIndex(butNotThisOne)
+  }
+  return index
 }
 
 function replayAnimations(element) {
@@ -71,15 +75,17 @@ function replayAnimations(element) {
   })
 }
 
-function loadCard(id = 0) {
+function loadCard(id = 0, butNotThatIndex) {
   const element = document.getElementById('card-' + id)
   const img = element.querySelector('img')
-  const card = getRandomCard()
+  const index = getRandomCardIndex(butNotThatIndex)
+  const card = DATA[index]
   CARD_DATA[id] = card
   img.alt = card.name
   img.src = card['img_uri']
   img.addEventListener('click', () => answer(id))
   replayAnimations(element)
+  return index
 }
 
 function cardsLoaded() {
@@ -205,8 +211,8 @@ function reset() {
 
 function setup() {
   activateModeToggle()
-  loadCard(0)
-  loadCard(1)
+  const firstCardIndex = loadCard(0)
+  loadCard(1, firstCardIndex)
   activateAnswers()
   renderPrices()
 }
