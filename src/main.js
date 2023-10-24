@@ -46,17 +46,15 @@ function toggleMode() {
 }
 
 async function getBulkData() {
-  return await fetch(FILE_URI, {
+  const response = await fetch(FILE_URI, {
     method: 'GET',
     credentials: 'include',
     mode: 'no-cors',
   })
-    .then((res) => res.blob())
-    .then((blob) => blob.stream())
-    .then((compressedStream) =>
-      compressedStream.pipeThrough(new DecompressionStream('gzip')),
-    )
-    .then((stream) => new Response(stream).json())
+  const blob = await response.blob()
+  const stream = await blob.stream()
+  const decompressed = await stream.pipeThrough(new DecompressionStream('gzip'))
+  return new Response(decompressed).json()
 }
 
 function getRandomCardIndex(butNotThisOne = null) {
