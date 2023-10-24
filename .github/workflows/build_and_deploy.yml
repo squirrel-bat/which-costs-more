@@ -1,4 +1,4 @@
-name: (Re)build data from Scryfall's bulk export
+name: (Re)build data and deploy site
 
 on:
   schedule:
