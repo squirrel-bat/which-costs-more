@@ -280,7 +280,7 @@ function handleKeyUp(e) {
   }
 }
 
-window.onload = () => {
+window.addEventListener('load', () => {
   getBulkData().then((bulkData) => {
     DATA = bulkData
     window.addEventListener('keydown', handleTheCode)
@@ -290,4 +290,4 @@ window.onload = () => {
     updateMode()
     setup()
   })
-}
+})
