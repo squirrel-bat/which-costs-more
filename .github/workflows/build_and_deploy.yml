@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: data_file
-          path: '../src/data.gzip'
+          path: 'src/data.gzip'
   deploy:
     needs: build
     name: Deploy static page with data artifact
