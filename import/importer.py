@@ -1,17 +1,22 @@
 import gzip
 import json
+import os
 import shutil
 import requests
 
-HR = "\n" + ("-" * shutil.get_terminal_size().columns) + "\n"
+VERSION = 1.1
+HR = "-" * shutil.get_terminal_size().columns
 API_URL = "https://api.scryfall.com/bulk-data/default-cards"
-OUTPUT_FILE = "../src/data.gzip"
+OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "../src/data.gzip")
 
 
 def get_bulk_json():
-    print(f"Fetching bulk URI from {API_URL}")
+    print(f"Fetching Bulk URI from {API_URL}")
     res = requests.get(API_URL).json()
-    print(f"Fetching bulk from {res['download_uri']}")
+    print(f"✔ Success")
+    print(
+        f"Fetching Bulk JSON (~{round(res['size'] / (1024**2), 2)} MB) from {res['download_uri']}"
+    )
     return requests.get(res["download_uri"]).json()
 
 
@@ -28,7 +33,6 @@ def is_valid_card(card):
 
 
 def parse_data(data_json):
-    print(f"Success.{HR}Read:    {len(data_json)}")
     card_data = list(
         {
             "name": card["name"],
@@ -39,15 +43,24 @@ def parse_data(data_json):
         for card in data_json
         if is_valid_card(card)
     )
-    json_data = json.dumps(card_data)
-    with gzip.open(OUTPUT_FILE, "w") as fp:
-        fp.write(json_data.encode("utf-8"))
+    percent = (len(card_data) / len(data_json)) * 100.0
+    print(f"Ported:  {len(card_data)} cards ({round(percent, 2)}%)")
+    return json.dumps(card_data)
+
+
+def write_gzip_file(output_file, data):
+    with gzip.open(output_file, "w") as fp:
+        fp.write(data.encode("utf-8"))
         fp.close()
-    print(f"Ported:  {len(card_data)}")
+    print(f"{HR}\nFile written to {os.path.realpath(fp.name)}\n{HR}")
 
 
 def main():
-    parse_data(get_bulk_json())
+    print(f"{HR}\nBulk Importer v{VERSION}\n{HR}")
+    data_json = get_bulk_json()
+    print(f"✔ Success\n{HR}\nRead:    {len(data_json)} cards")
+    data = parse_data(data_json)
+    write_gzip_file(OUTPUT_FILE, data)
 
 
 main()
