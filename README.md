@@ -1,5 +1,5 @@
 # Which Card Costs More?
-Let's find out.
+Let's find out: https://squirrel-bat.github.io/which-costs-more/
 
 ## Development
 ### Prerequisites
