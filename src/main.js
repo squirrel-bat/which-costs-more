@@ -17,7 +17,21 @@ const THE_CODE = {
 const FILE_URI = './data.gzip'
 let DATA = []
 const CARD_DATA = []
-const RESULTS = []
+const RESULTS = {
+  _cards: [],
+  add(card) {
+    this._cards.push(card)
+  },
+  get winRate() {
+    const wins = this._cards.filter(
+      (card) => card.status === STATUS_SUCCESS,
+    ).length
+    const draws = this._cards.filter(
+      (card) => card.status === STATUS_DRAW,
+    ).length
+    return wins / (this._cards.length - draws)
+  },
+}
 const STATUS_SUCCESS = 'success'
 const STATUS_DRAW = 'draw'
 const STATUS_FAILURE = 'failure'
@@ -90,21 +104,32 @@ function cardsLoaded() {
   return document.querySelectorAll('.card img:not([src=""])').length === 2
 }
 
+function getCardStatus(selectedCard, otherCard) {
+  if (
+    !selectedCard.hasOwnProperty('prices') ||
+    !otherCard.hasOwnProperty('prices')
+  ) {
+    throw new Error('Missing prices on card objects.')
+  }
+  const currency = Object.keys(MODES).at(MODE)
+  return Number(selectedCard.prices[currency]) >
+    Number(otherCard.prices[currency])
+    ? STATUS_SUCCESS
+    : Number(selectedCard.prices[currency]) ===
+      Number(otherCard.prices[currency])
+    ? STATUS_DRAW
+    : STATUS_FAILURE
+}
+
 function evaulateAnswer(id) {
   const selectedCard = CARD_DATA[id]
   const otherCard = CARD_DATA[1 - id]
   const resultObject = {
     name: selectedCard.name,
     url: selectedCard['scryfall_uri'],
-    status:
-      Number(selectedCard.prices[currency]) > Number(otherCard.prices[currency])
-        ? STATUS_SUCCESS
-        : Number(selectedCard.prices[currency]) ===
-          Number(otherCard.prices[currency])
-        ? STATUS_DRAW
-        : STATUS_FAILURE,
+    status: getCardStatus(selectedCard, otherCard),
   }
-  RESULTS.push(resultObject)
+  RESULTS.add(resultObject)
   return resultObject
 }
 
@@ -135,15 +160,24 @@ function resultIsActive() {
   return document.querySelector('main').classList.contains('results')
 }
 
+function updateResultList() {
+  document.getElementById('result-list').classList.remove('hidden')
+  document.getElementById('win-rate-score').innerText =
+    (RESULTS.winRate * 100).toFixed(2) + '%'
+  document.getElementById('win-rate').classList.remove('hidden')
+}
+
 function answer(id) {
   if (!cardsLoaded() || resultIsActive()) return
   deactivateAnswers()
   deactivateModeToggle()
   const result = evaulateAnswer(id)
   showResults(id, result)
-  document.getElementById('result-list').classList.remove('hidden')
   addResultListItem(result)
-  setTimeout(activateResetButton, 300)
+  setTimeout(() => {
+    activateResetButton()
+    updateResultList()
+  }, 300)
 }
 
 function addResultListItem(result) {
