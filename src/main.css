@@ -123,6 +123,10 @@ a:hover {
   filter: blur(2px);
 }
 
+.results #mode-toggle {
+  animation: none;
+}
+
 .hint {
   font-size: 1.5rem;
   font-weight: bold;
@@ -462,13 +466,16 @@ button:active {
   padding: 3rem 0;
   margin: 0;
 }
+
 #win-rate {
   text-align: center;
   font-size: 2.8rem !important;
 }
+
 #win-rate-score {
   color: var(--blue-dark);
 }
+
 #result-list {
   font-weight: bold;
   position: relative;
