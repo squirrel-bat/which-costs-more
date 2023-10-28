@@ -305,7 +305,23 @@ function handleKeyUp(e) {
   }
 }
 
+function generateBGitems() {
+  const parentNode = document.createElement('div')
+  parentNode.id = 'bg-items'
+  for (let i = 1; i <= 10; i += 2) {
+    for (let x = 1; x <= 10; x++) {
+      const y = x % 2 === 0 ? i + 1 : i
+      const item = document.createElement('div')
+      item.style.setProperty('--pos-x', x.toString())
+      item.style.setProperty('--pos-y', y.toString())
+      parentNode.appendChild(item)
+    }
+  }
+  document.querySelector('body').appendChild(parentNode)
+}
+
 window.addEventListener('load', () => {
+  generateBGitems()
   getBulkData().then((bulkData) => {
     DATA = bulkData
     window.addEventListener('keydown', handleTheCode)

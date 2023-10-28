@@ -1,3 +1,15 @@
+@keyframes bg-item {
+  0% {
+    transform: translate(var(--pos-x-start), var(--pos-y-start));
+  }
+  100% {
+    transform: translate(
+      calc(var(--pos-x-start) + 100cqw),
+      calc(var(--pos-y-start) - 100cqh)
+    );
+  }
+}
+
 @keyframes pulse {
   0%,
   100% {

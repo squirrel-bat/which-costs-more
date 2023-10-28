@@ -61,12 +61,42 @@ html {
 
 body {
   font-size: 3rem;
+  position: relative;
   display: flex;
   align-items: stretch;
   flex-direction: column;
   justify-content: space-between;
   min-height: 100dvh;
   margin: 0;
+}
+
+#bg-items {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  container-type: inline-size;
+  z-index: -2;
+  /*Defaults to be overwritten by child's style attr*/
+  --pos-x: 1;
+  --pos-y: 1;
+}
+#bg-items > div {
+  font-family: 'Young Serif', serif;
+  font-size: 12rem;
+  font-weight: normal;
+  line-height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  --pos-x-start: calc(var(--pos-x) * 20cqw - 120cqw);
+  --pos-y-start: calc(var(--pos-y) * 20cqh - 20cqh);
+  animation: bg-item 120s infinite linear;
+  color: var(--black-20);
+}
+#bg-items > div:before {
+  content: var(--mode);
 }
 
 #copyright {
@@ -324,7 +354,9 @@ main:not(.results) .row:hover .col:not(:hover) .card.active img {
 
 .results .card:after {
   font-size: 20rem;
-  line-height: 21rem;
+  /*line-height: 22rem;*/
+  line-height: 0;
+  padding-top: 45%;
   top: 0;
   left: 0;
   display: flex !important;
@@ -341,7 +373,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active img {
 }
 
 .success:after {
-  content: '✔' !important;
+  content: '\2713' !important;
   color: var(--green);
   background: none !important;
 }
@@ -354,7 +386,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active img {
 }
 
 .failure:after {
-  content: '✘' !important;
+  content: '\2718' !important;
   color: var(--red);
   background: none !important;
 }
@@ -463,13 +495,13 @@ button:active {
 
 #reset-btn-container {
   position: relative;
-  padding: 3rem 0;
   margin: 0;
+  padding: 3rem 0;
 }
 
 #win-rate {
-  text-align: center;
   font-size: 2.8rem !important;
+  text-align: center;
 }
 
 #win-rate-score {
@@ -559,10 +591,6 @@ button:active {
   animation: var(--fade-in-default);
   border-bottom: 0.15rem solid var(--blue);
 }
-
-/*.list-item:first-child {*/
-/*  border-top: 0.15rem solid var(--blue);*/
-/*}*/
 
 .list-item a {
   position: relative;
