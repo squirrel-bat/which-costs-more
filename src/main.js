@@ -93,15 +93,22 @@ function loadCard(id = 0, butNotThatIndex) {
   const index = getRandomCardIndex(butNotThatIndex)
   const card = DATA[index]
   CARD_DATA[id] = card
+  element.classList.add('loading')
+  img.addEventListener('load', () => {
+    element.classList.remove('loading')
+  })
+  img.addEventListener('click', () => answer(id))
   img.alt = card.name
   img.src = card['img_uri']
-  img.addEventListener('click', () => answer(id))
   replayAnimations(element)
   return index
 }
 
 function cardsLoaded() {
-  return document.querySelectorAll('.card img:not([src=""])').length === 2
+  return (
+    document.querySelectorAll('.card:not(.loading) img:not([src=""])')
+      .length === 2
+  )
 }
 
 function getCardStatus(selectedCard, otherCard) {
@@ -209,9 +216,10 @@ function activateAnswers() {
   document.querySelectorAll('.card').forEach((e) => e.classList.add('active'))
 }
 function deactivateAnswers() {
-  document
-    .querySelectorAll('.card')
-    .forEach((e) => e.classList.remove('active'))
+  document.querySelectorAll('.card').forEach((e) => {
+    e.classList.remove('active')
+    e.querySelector('img').removeEventListener('click', answer)
+  })
 }
 
 function activateResetButton() {

@@ -329,26 +329,27 @@ a:hover {
 /*.card:has(img:not([src=''])):after {*/
 /*  display: none;*/
 /*}*/
-main:not(.results) .card:not(.active) {
+main:not(.results) .card:not(.active),
+.card.loading {
   background: var(--black-20);
 }
 
-.card.active:before,
-.card.active:after,
+.card.active:not(.loading):before,
+.card.active:not(.loading):after,
 .results .card:before {
   display: none;
 }
 
 /* END TODO */
 
-.col:hover .card.active img {
+.col:hover .card.active:not(.loading) img {
   box-shadow:
     0 0 5rem 0.1rem var(--orange),
     0 0 1rem 0.1rem var(--orange);
   scale: 1.1;
 }
 
-main:not(.results) .row:hover .col:not(:hover) .card.active img {
+main:not(.results) .row:hover .col:not(:hover) .card.active:not(.loading) img {
   scale: 0.95;
 }
 
@@ -373,7 +374,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active img {
 }
 
 .success:after {
-  content: '\2713' !important;
+  content: '\2714' !important;
   color: var(--green);
   background: none !important;
 }
