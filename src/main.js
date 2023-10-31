@@ -325,7 +325,7 @@ function generateBGitems() {
       parentNode.appendChild(item)
     }
   }
-  document.querySelector('body').appendChild(parentNode)
+  document.querySelector('html').appendChild(parentNode)
 }
 
 window.addEventListener('load', () => {

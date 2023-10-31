@@ -72,12 +72,12 @@ body {
 
 #bg-items {
   position: absolute;
+  z-index: -2;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   container-type: inline-size;
-  z-index: -2;
   /*Defaults to be overwritten by child's style attr*/
   --pos-x: 1;
   --pos-y: 1;
@@ -90,10 +90,10 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  --pos-x-start: calc(var(--pos-x) * 20cqw - 120cqw);
-  --pos-y-start: calc(var(--pos-y) * 20cqh - 20cqh);
   animation: bg-item 120s infinite linear;
   color: var(--black-20);
+  --pos-x-start: calc(var(--pos-x) * 20cqw - 120cqw);
+  --pos-y-start: calc(var(--pos-y) * 20cqh - 20cqh);
 }
 #bg-items > div:before {
   content: var(--mode);
@@ -357,7 +357,6 @@ main:not(.results) .row:hover .col:not(:hover) .card.active:not(.loading) img {
   font-size: 20rem;
   /*line-height: 22rem;*/
   line-height: 0;
-  padding-top: 45%;
   top: 0;
   left: 0;
   display: flex !important;
@@ -365,6 +364,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active:not(.loading) img {
   justify-content: center;
   width: 100%;
   height: 100%;
+  padding-top: 45%;
   content: '';
   animation: var(--fade-in-default);
   border-radius: var(--card-border-radius);
