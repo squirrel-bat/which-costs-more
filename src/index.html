@@ -3,41 +3,41 @@
   <head>
     <title>Which Card Costs More?</title>
     <meta charset="utf-8" lang="en" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta
-      http-equiv="Content-Security-Policy"
       content="default-src 'self' *.scryfall.io; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+      http-equiv="Content-Security-Policy"
     />
     <link
+      href="./apple-touch-icon.png"
       rel="apple-touch-icon"
       sizes="180x180"
-      href="./apple-touch-icon.png"
     />
     <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
       href="./favicon-32x32.png"
+      rel="icon"
+      sizes="32x32"
+      type="image/png"
     />
     <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
       href="./favicon-16x16.png"
+      rel="icon"
+      sizes="16x16"
+      type="image/png"
     />
-    <link rel="manifest" href="./site.webmanifest" />
-    <link rel="preload" href="./AmaticSC-Regular.ttf" as="font" crossorigin />
-    <link rel="preload" href="./YoungSerif-Regular.ttf" as="font" crossorigin />
+    <link href="./site.webmanifest" rel="manifest" />
+    <link as="font" crossorigin href="./AmaticSC-Regular.ttf" rel="preload" />
+    <link as="font" crossorigin href="./YoungSerif-Regular.ttf" rel="preload" />
 
-    <link rel="stylesheet" href="./animations.css" />
-    <link rel="stylesheet" href="./main.css" />
+    <link href="./animations.css" rel="stylesheet" />
+    <link href="./main.css" rel="stylesheet" />
     <script src="./main.js"></script>
   </head>
   <body>
     <main>
       <h1 id="title">
         Which card costs more
-        <span id="mode-toggle" class="coin"></span>?
+        <span class="coin" id="mode-toggle"></span>?
         <span class="hint">
           click to swap currency <span class="hint-arrow">↝</span>
           <kbd class="display-none key letter" style="--key: 'C'"></kbd>
@@ -48,27 +48,27 @@
       </span>
       <div class="row">
         <div class="col">
-          <figure id="card-0" class="card">
-            <img src="" alt="&nbsp;" draggable="false" />
+          <figure class="card" id="card-0">
+            <img alt="&nbsp;" draggable="false" src="" />
           </figure>
-          <div id="prices-0" class="prices">
+          <div class="prices" id="prices-0">
             <div><span class="coin"></span><span class="price">0.00</span></div>
           </div>
           <kbd class="key display-none" style="--key: '1'"></kbd>
         </div>
         <div class="col">
-          <figure id="card-1" class="card">
-            <img src="" alt="&nbsp;" draggable="false" />
+          <figure class="card" id="card-1">
+            <img alt="&nbsp;" draggable="false" src="" />
           </figure>
-          <div id="prices-1" class="prices">
+          <div class="prices" id="prices-1">
             <div><span class="coin"></span><span class="price">0.00</span></div>
           </div>
           <kbd class="key display-none" style="--key: '2'"></kbd>
         </div>
       </div>
-      <div id="cheat-data" class="row display-none">
+      <div class="row display-none" id="cheat-data">
         <div class="col">
-          <div id="cheat-prices-0" class="price-row">
+          <div class="price-row" id="cheat-prices-0">
             <div class="usd">
               <span class="coin"></span><span class="cheat-price">0.00</span>
             </div>
@@ -78,7 +78,7 @@
           </div>
         </div>
         <div class="col">
-          <div id="cheat-prices-1" class="price-row">
+          <div class="price-row" id="cheat-prices-1">
             <div class="usd">
               <span class="coin"></span><span class="cheat-price">0.00</span>
             </div>
@@ -89,14 +89,27 @@
         </div>
       </div>
       <div id="reset-btn-container">
-        <button id="reset-btn" class="hidden">Draw Again!</button>
+        <button class="hidden" id="reset-btn">Draw Again!</button>
         <kbd class="key enter display-none" style="--key: '↵ Enter'"></kbd>
       </div>
-      <div id="result-list" class="hidden">
-        <div id="win-rate" class="hidden">
+      <div class="hidden" id="result-list">
+        <div class="hidden" id="win-rate">
           <span id="win-rate-score">0.00%</span>&nbsp;Success Rate
         </div>
         <div class="list-body"></div>
+        <template id="list-row">
+          <div class="list-item">
+            <span class="status-icon"></span>
+            <div class="list-item-body">
+              <a class="link-0" href="" target="_blank"></a>
+              <div class="versus-body">
+                <span class="versus">VS</span>
+                <a class="link-1" href="" target="_blank"></a>
+              </div>
+            </div>
+            <div class="expand"><div class="expand-icon"></div></div>
+          </div>
+        </template>
       </div>
     </main>
     <footer>

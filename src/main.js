@@ -135,6 +135,7 @@ function evaulateAnswer(id) {
     name: selectedCard.name,
     url: selectedCard['scryfall_uri'],
     status: getCardStatus(selectedCard, otherCard),
+    versus: { name: otherCard.name, url: otherCard['scryfall_uri'] },
   }
   RESULTS.add(resultObject)
   return resultObject
@@ -184,20 +185,25 @@ function answer(id) {
   setTimeout(() => {
     activateResetButton()
     updateResultList()
-  }, 300)
+  }, 100)
 }
 
 function addResultListItem(result) {
-  const a = document.createElement('a')
-  a.target = '_blank'
-  a.href = result.url
-  a.innerText = result.name
-  const span = document.createElement('span')
-  span.classList.add(result.status)
-  const div = document.createElement('div')
-  div.classList.add('list-item')
-  div.append(span, a)
-  document.querySelector('#result-list .list-body').prepend(div)
+  const template = document.getElementById('list-row')
+  const row = template.content.cloneNode(true)
+  row.querySelector('.status-icon').classList.add(result.status)
+  const link0 = row.querySelector('.link-0')
+  link0.innerText = result.name.split('//')[0]
+  link0.href = result.url
+  const link1 = row.querySelector('.link-1')
+  link1.innerText = result.versus.name.split('//')[0]
+  link1.href = result.versus.url
+  row
+    .querySelector('.expand')
+    .addEventListener('mousedown', (e) =>
+      e.target.closest('.list-item').classList.toggle('checked'),
+    )
+  document.querySelector('#result-list .list-body').prepend(row)
 }
 
 function activateModeToggle() {
@@ -316,8 +322,8 @@ function handleKeyUp(e) {
 function generateBGitems() {
   const parentNode = document.createElement('div')
   parentNode.id = 'bg-items'
-  for (let i = 1; i <= 10; i += 2) {
-    for (let x = 1; x <= 10; x++) {
+  for (let i = 0; i < 8; i += 2) {
+    for (let x = 0; x < 8; x++) {
       const y = x % 2 === 0 ? i + 1 : i
       const item = document.createElement('div')
       item.style.setProperty('--pos-x', x.toString())
