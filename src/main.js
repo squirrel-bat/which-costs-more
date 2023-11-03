@@ -93,6 +93,13 @@ function cardsLoaded() {
 function evaulateAnswer(id) {
   const selectedCard = CARD_DATA[id]
   const otherCard = CARD_DATA[1 - id]
+  if (
+    !selectedCard.hasOwnProperty('prices') ||
+    !otherCard.hasOwnProperty('prices')
+  ) {
+    throw new Error('Missing prices on card objects.')
+  }
+  const currency = Object.keys(MODES).at(MODE)
   const resultObject = {
     name: selectedCard.name,
     url: selectedCard['scryfall_uri'],
