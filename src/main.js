@@ -17,7 +17,21 @@ const THE_CODE = {
 const FILE_URI = './data.gzip'
 let DATA = []
 const CARD_DATA = []
-const RESULTS = []
+const RESULTS = {
+  _cards: [],
+  add(card) {
+    this._cards.push(card)
+  },
+  get winRate() {
+    const wins = this._cards.filter(
+      (card) => card.status === STATUS_SUCCESS,
+    ).length
+    const draws = this._cards.filter(
+      (card) => card.status === STATUS_DRAW,
+    ).length
+    return wins / (this._cards.length - draws)
+  },
+}
 const STATUS_SUCCESS = 'success'
 const STATUS_DRAW = 'draw'
 const STATUS_FAILURE = 'failure'
@@ -79,15 +93,39 @@ function loadCard(id = 0, butNotThatIndex) {
   const index = getRandomCardIndex(butNotThatIndex)
   const card = DATA[index]
   CARD_DATA[id] = card
+  element.classList.add('loading')
+  img.addEventListener('load', () => {
+    element.classList.remove('loading')
+  })
+  img.addEventListener('click', () => answer(id))
   img.alt = card.name
   img.src = card['img_uri']
-  img.addEventListener('click', () => answer(id))
   replayAnimations(element)
   return index
 }
 
 function cardsLoaded() {
-  return document.querySelectorAll('.card img:not([src=""])').length === 2
+  return (
+    document.querySelectorAll('.card:not(.loading) img:not([src=""])')
+      .length === 2
+  )
+}
+
+function getCardStatus(selectedCard, otherCard) {
+  if (
+    !selectedCard.hasOwnProperty('prices') ||
+    !otherCard.hasOwnProperty('prices')
+  ) {
+    throw new Error('Missing prices on card objects.')
+  }
+  const currency = Object.keys(MODES).at(MODE)
+  return Number(selectedCard.prices[currency]) >
+    Number(otherCard.prices[currency])
+    ? STATUS_SUCCESS
+    : Number(selectedCard.prices[currency]) ===
+      Number(otherCard.prices[currency])
+    ? STATUS_DRAW
+    : STATUS_FAILURE
 }
 
 function evaulateAnswer(id) {
@@ -103,15 +141,10 @@ function evaulateAnswer(id) {
   const resultObject = {
     name: selectedCard.name,
     url: selectedCard['scryfall_uri'],
-    status:
-      Number(selectedCard.prices[currency]) > Number(otherCard.prices[currency])
-        ? STATUS_SUCCESS
-        : Number(selectedCard.prices[currency]) ===
-          Number(otherCard.prices[currency])
-        ? STATUS_DRAW
-        : STATUS_FAILURE,
+    status: getCardStatus(selectedCard, otherCard),
+    versus: { name: otherCard.name, url: otherCard['scryfall_uri'] },
   }
-  RESULTS.push(resultObject)
+  RESULTS.add(resultObject)
   return resultObject
 }
 
@@ -142,28 +175,42 @@ function resultIsActive() {
   return document.querySelector('main').classList.contains('results')
 }
 
+function updateResultList() {
+  document.getElementById('result-list').classList.remove('hidden')
+  document.getElementById('win-rate-score').innerText =
+    (RESULTS.winRate * 100).toFixed(2) + '%'
+  document.getElementById('win-rate').classList.remove('hidden')
+}
+
 function answer(id) {
   if (!cardsLoaded() || resultIsActive()) return
   deactivateAnswers()
   deactivateModeToggle()
   const result = evaulateAnswer(id)
   showResults(id, result)
-  document.getElementById('result-list').classList.remove('hidden')
   addResultListItem(result)
-  setTimeout(activateResetButton, 300)
+  setTimeout(() => {
+    activateResetButton()
+    updateResultList()
+  }, 100)
 }
 
 function addResultListItem(result) {
-  const a = document.createElement('a')
-  a.target = '_blank'
-  a.href = result.url
-  a.innerText = result.name
-  const span = document.createElement('span')
-  span.classList.add(result.status)
-  const div = document.createElement('div')
-  div.classList.add('list-item')
-  div.append(span, a)
-  document.querySelector('#result-list .list-body').prepend(div)
+  const template = document.getElementById('list-row')
+  const row = template.content.cloneNode(true)
+  row.querySelector('.status-icon').classList.add(result.status)
+  const link0 = row.querySelector('.link-0')
+  link0.innerText = result.name.split('//')[0]
+  link0.href = result.url
+  const link1 = row.querySelector('.link-1')
+  link1.innerText = result.versus.name.split('//')[0]
+  link1.href = result.versus.url
+  row
+    .querySelector('.expand')
+    .addEventListener('mousedown', (e) =>
+      e.target.closest('.list-item').classList.toggle('checked'),
+    )
+  document.querySelector('#result-list .list-body').prepend(row)
 }
 
 function activateModeToggle() {
@@ -182,9 +229,10 @@ function activateAnswers() {
   document.querySelectorAll('.card').forEach((e) => e.classList.add('active'))
 }
 function deactivateAnswers() {
-  document
-    .querySelectorAll('.card')
-    .forEach((e) => e.classList.remove('active'))
+  document.querySelectorAll('.card').forEach((e) => {
+    e.classList.remove('active')
+    e.querySelector('img').removeEventListener('click', answer)
+  })
 }
 
 function activateResetButton() {
@@ -278,7 +326,23 @@ function handleKeyUp(e) {
   }
 }
 
+function generateBGitems() {
+  const parentNode = document.createElement('div')
+  parentNode.id = 'bg-items'
+  for (let i = 0; i < 8; i += 2) {
+    for (let x = 0; x < 8; x++) {
+      const y = x % 2 === 0 ? i + 1 : i
+      const item = document.createElement('div')
+      item.style.setProperty('--pos-x', x.toString())
+      item.style.setProperty('--pos-y', y.toString())
+      parentNode.appendChild(item)
+    }
+  }
+  document.querySelector('html').appendChild(parentNode)
+}
+
 window.addEventListener('load', () => {
+  generateBGitems()
   getBulkData().then((bulkData) => {
     DATA = bulkData
     window.addEventListener('keydown', handleTheCode)
@@ -288,4 +352,14 @@ window.addEventListener('load', () => {
     updateMode()
     setup()
   })
+})
+
+let resizeTimeout = false
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    const bgItems = document.getElementById('bg-items')
+    bgItems.remove()
+    document.querySelector('html').appendChild(bgItems)
+  }, 50)
 })

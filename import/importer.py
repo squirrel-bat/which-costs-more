@@ -33,7 +33,7 @@ def is_valid_card(card):
 
 
 def parse_data(data_json):
-    card_data = list(
+    card_data = [
         {
             "name": card["name"],
             "img_uri": card["image_uris"]["normal"],
@@ -42,7 +42,7 @@ def parse_data(data_json):
         }
         for card in data_json
         if is_valid_card(card)
-    )
+    ]
     percent = (len(card_data) / len(data_json)) * 100.0
     print(f"Ported:  {len(card_data)} cards ({round(percent, 2)}%)")
     return json.dumps(card_data)
