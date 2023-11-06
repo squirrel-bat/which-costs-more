@@ -75,17 +75,17 @@ body {
   z-index: -2;
   top: 0;
   left: 0;
-  width: 100%;
   height: 100%;
+  width: 100%;
   container-type: inline-size;
 }
 #bg-items > div {
   --pos-x: 0;
   --pos-y: 0;
-  --pos-x-start: calc(var(--pos-x) * 20vw - 30vw);
-  --pos-y-start: calc(var(--pos-y) * 20vh - 10vh);
+  --pos-x-start: calc(var(--pos-x) * 20cqw - 30cqw);
+  --pos-y-start: calc(var(--pos-y) * 20cqh - 10cqh);
   font-family: 'Young Serif', serif;
-  font-size: 12rem;
+  font-size: min(12rem, 20cqmin);
   font-weight: normal;
   line-height: 100%;
   position: absolute;

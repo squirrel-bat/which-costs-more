@@ -4,8 +4,8 @@
   }
   100% {
     transform: translate(
-      calc(var(--pos-x-start) + 40vw),
-      calc(var(--pos-y-start) - 40vh)
+      calc(var(--pos-x-start) + 40cqw),
+      calc(var(--pos-y-start) - 40cqh)
     );
   }
 }

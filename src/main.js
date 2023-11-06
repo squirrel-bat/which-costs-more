@@ -346,3 +346,13 @@ window.addEventListener('load', () => {
     setup()
   })
 })
+
+let resizeTimeout = false
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    const bgItems = document.getElementById('bg-items')
+    bgItems.remove()
+    document.querySelector('html').appendChild(bgItems)
+  }, 50)
+})
