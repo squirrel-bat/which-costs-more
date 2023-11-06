@@ -137,7 +137,6 @@ function evaulateAnswer(id) {
   ) {
     throw new Error('Missing prices on card objects.')
   }
-  const currency = Object.keys(MODES).at(MODE)
   const resultObject = {
     name: selectedCard.name,
     url: selectedCard['scryfall_uri'],
