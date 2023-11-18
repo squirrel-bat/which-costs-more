@@ -263,35 +263,30 @@ function setup() {
   renderPrices()
 }
 
+function showCheatmodeEnabled() {
+  const cheatInfo = document.createElement('span')
+  cheatInfo.id = 'cheatmode'
+  cheatInfo.innerText = 'Cheat Mode Activated!'
+  document.getElementById('title').prepend(cheatInfo)
+  Object.keys(MODES).forEach((key) =>
+    document
+      .querySelectorAll('.' + key)
+      .forEach((item) =>
+        item.style.setProperty('--mode', '"' + MODES[key] + '"', 'important'),
+      ),
+  )
+  THE_CODE.active = true
+  renderPrices()
+}
+
 function handleTheCode(e) {
   THE_CODE.pos = e.key === THE_CODE.code[THE_CODE.pos] ? THE_CODE.pos + 1 : 0
   if (THE_CODE.pos === THE_CODE.code.length) {
     if (!THE_CODE.active) {
-      const cheatInfo = document.createElement('span')
-      cheatInfo.id = 'cheatmode'
-      cheatInfo.innerText = 'Cheat Mode Activated!'
-      document.getElementById('title').prepend(cheatInfo)
-      Object.keys(MODES).forEach((key) =>
-        document
-          .querySelectorAll('.' + key)
-          .forEach((item) =>
-            item.style.setProperty(
-              '--mode',
-              '"' + MODES[key] + '"',
-              'important',
-            ),
-          ),
-      )
+      showCheatmodeEnabled()
     }
-    THE_CODE.active = true
-    renderPrices()
     window.removeEventListener('keydown', handleTheCode)
   }
-}
-
-function cheat() {
-  THE_CODE.active = true
-  renderPrices()
 }
 
 function handleKeyDown(e) {
@@ -347,7 +342,9 @@ window.addEventListener('load', () => {
     window.addEventListener('keydown', handleTheCode)
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
-    document.getElementById('cheat-btn').addEventListener('click', cheat)
+    document
+      .getElementById('cheat-btn')
+      .addEventListener('click', showCheatmodeEnabled)
     updateMode()
     setup()
   })
