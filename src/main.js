@@ -66,8 +66,8 @@ async function getBulkData() {
     mode: 'no-cors',
   })
   const blob = await response.blob()
-  const stream = await blob.stream()
-  const decompressed = await stream.pipeThrough(new DecompressionStream('gzip'))
+  const stream = blob.stream()
+  const decompressed = stream.pipeThrough(new DecompressionStream('gzip'))
   return new Response(decompressed).json()
 }
 
@@ -93,6 +93,7 @@ function loadCard(id = 0, butNotThatIndex) {
   const index = getRandomCardIndex(butNotThatIndex)
   const card = DATA[index]
   CARD_DATA[id] = card
+  console.log([index, card])
   element.classList.add('loading')
   img.addEventListener('load', () => {
     element.classList.remove('loading')
@@ -123,9 +124,9 @@ function getCardStatus(selectedCard, otherCard) {
     Number(otherCard.prices[currency])
     ? STATUS_SUCCESS
     : Number(selectedCard.prices[currency]) ===
-      Number(otherCard.prices[currency])
-    ? STATUS_DRAW
-    : STATUS_FAILURE
+        Number(otherCard.prices[currency])
+      ? STATUS_DRAW
+      : STATUS_FAILURE
 }
 
 function evaulateAnswer(id) {
