@@ -93,7 +93,6 @@ function loadCard(id = 0, butNotThatIndex) {
   const index = getRandomCardIndex(butNotThatIndex)
   const card = DATA[index]
   CARD_DATA[id] = card
-  console.log([index, card])
   element.classList.add('loading')
   img.addEventListener('load', () => {
     element.classList.remove('loading')
