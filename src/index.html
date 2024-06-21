@@ -52,10 +52,60 @@
           click to swap currency <span class="hint-arrow">↝</span>
           <kbd class="display-none key letter" style="--key: 'C'"></kbd>
         </span>
+        <div id="settings-button">
+          <div class="settings-icon">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div>Filters!</div>
+          <kbd class="display-none key letter" style="--key: 'F'"></kbd>
+        </div>
       </h1>
+
+      <div id="settings">
+        <div class="settings-body">
+          <div class="close-btn-wrapper">
+            <button id="settings-close">✖</button>
+          </div>
+          <label class="min-price-label" for="min-price-slider"
+            >Minimum Card Price:<span id="min-price-val"
+              ><span class="currency"></span>&nbsp;<span class="value"
+                >0.00</span
+              ></span
+            ></label
+          >
+          <div id="min-price">
+            <input
+              type="range"
+              id="min-price-slider"
+              value="0"
+              step=".1"
+              min="0"
+              max="5"
+              draggable="false"
+            />
+            <datalist id="min-price-list">
+              <option value="0" label="0"></option>
+              <option value=".5"></option>
+              <option value="1" label="1"></option>
+              <option value="1.5"></option>
+              <option value="2" label="2"></option>
+              <option value="2.5"></option>
+              <option value="3" label="3"></option>
+              <option value="3.5"></option>
+              <option value="4" label="4"></option>
+              <option value="4.5"></option>
+              <option value="5" label="5"></option>
+            </datalist>
+          </div>
+        </div>
+      </div>
+
       <span class="hint hint-controls">
         Hold <kbd>[Shift]</kbd> to see keyboard controls
       </span>
+
       <div class="row">
         <div class="col">
           <figure class="card" id="card-0">

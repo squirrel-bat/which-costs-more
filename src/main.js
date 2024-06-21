@@ -15,7 +15,11 @@ const THE_CODE = {
   ],
 }
 const FILE_URI = './data.gzip'
+let BULK_DATA = []
 let DATA = []
+const FILTERS = {
+  minimumPrice: 0.0,
+}
 const CARD_DATA = []
 const RESULTS = {
   _cards: [],
@@ -308,6 +312,9 @@ function handleKeyUp(e) {
         .querySelector('#mode-toggle')
         .dispatchEvent(new Event('mousedown'))
       break
+    case 'f':
+      document.querySelector('#settings-button').click()
+      break
     case '1':
       document.querySelector('#card-0 img').click()
       break
@@ -316,6 +323,9 @@ function handleKeyUp(e) {
       break
     case 'Enter':
       document.querySelector('#reset-btn').click()
+      break
+    case 'Escape':
+      document.querySelector('#settings-close').click()
       break
   }
 }
@@ -338,13 +348,13 @@ function generateBGitems() {
 window.addEventListener('load', () => {
   generateBGitems()
   getBulkData().then((bulkData) => {
-    DATA = bulkData
+    BULK_DATA = bulkData
+    DATA = BULK_DATA
     window.addEventListener('keydown', handleTheCode)
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
-    document
-      .getElementById('cheat-btn')
-      .addEventListener('click', showCheatmodeEnabled)
+    wireUpButtons()
+    wireUpSettings()
     updateMode()
     setup()
   })
@@ -359,3 +369,43 @@ window.addEventListener('resize', () => {
     document.querySelector('html').appendChild(bgItems)
   }, 50)
 })
+
+// Filtering
+
+function wireUpButtons() {
+  document
+    .getElementById('cheat-btn')
+    .addEventListener('click', showCheatmodeEnabled)
+  const settingsElement = document.getElementById('settings')
+  document.getElementById('settings-button').addEventListener('click', () => {
+    settingsElement.classList.add('open')
+  })
+  document.getElementById('settings-close').addEventListener('click', () => {
+    settingsElement.classList.remove('open')
+  })
+}
+
+function wireUpSettings() {
+  const minPriceSlider = document.getElementById('min-price-slider')
+  minPriceSlider.addEventListener('input', (ev) => {
+    document.querySelector('#min-price-val .value').innerText = Number(
+      ev.target.value,
+    ).toFixed(2)
+  })
+  minPriceSlider.addEventListener('mouseup', applyMinimumPriceFilter)
+}
+
+function applyMinimumPriceFilter(ev) {
+  const value = ev.target.value
+  if (Number(value) == Number(FILTERS.minimumPrice)) return
+  FILTERS.minimumPrice = value
+  cutOffAtPrice(value)
+  reset()
+}
+
+function cutOffAtPrice(minPrice = 0) {
+  const currency = Object.keys(MODES).at(MODE)
+  DATA = BULK_DATA.filter(
+    (el) => Number(el.prices[currency]) >= Number(minPrice),
+  )
+}

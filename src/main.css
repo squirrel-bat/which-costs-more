@@ -27,6 +27,7 @@
   --green: rgb(50, 205, 50);
   --red: rgb(230, 50, 0);
   --white: rgb(230, 225, 220);
+  --white-20: rgba(230, 225, 220, 0.2);
   --grey-light: rgb(180, 180, 180);
   --grey: rgb(130, 130, 130);
   --grey-dark: rgb(64, 64, 64);
@@ -359,8 +360,8 @@ main:not(.results) .row:hover .col:not(:hover) .card.active:not(.loading) img {
 }
 
 .results .card:after {
+  pointer-events: none;
   font-size: 20rem;
-  /*line-height: 22rem;*/
   line-height: 0;
   top: 0;
   left: 0;
@@ -400,6 +401,7 @@ main:not(.results) .row:hover .col:not(:hover) .card.active:not(.loading) img {
 .prices {
   --prices-font-size: 5rem;
   --oversize: 0.15;
+  container-type: inline-size;
   font-family: 'Young Serif', serif;
   font-size: 5rem;
   position: absolute;
@@ -458,8 +460,8 @@ main:not(.results) .row:hover .col:not(:hover) .card.active:not(.loading) img {
 }
 
 .price {
-  font-size: 4rem;
-  line-height: 4rem;
+  font-size: min(15.7cqw, 0.75em);
+  line-height: min(15.7cqw, 0.75em);
   position: absolute;
   top: 50%;
   left: 60%;
@@ -746,4 +748,254 @@ kbd.key.enter:before {
   .hint-controls {
     display: none;
   }
+}
+#settings-button {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  translate: 0.5em 77%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: var(--text-shadow-default);
+  cursor: pointer;
+  transition: all 150ms ease-out;
+  padding: 0.1em 0.5em 0.1em 0.3em;
+  border-radius: 0.25em;
+  color: var(--gold-light);
+  user-select: none;
+}
+#settings-button:hover {
+  background: var(--white-20);
+}
+
+#settings-button:active {
+  opacity: 0.8;
+  box-shadow: none;
+  transform: translateY(0.15em);
+  filter: none;
+}
+.settings-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  translate: 0 -0.1em;
+  width: 1.8em;
+  filter: drop-shadow(-0.08em 0.08em 0 var(--black-50));
+  scale: -0.6 0.6;
+}
+.settings-icon + div {
+  margin-left: 1.5em;
+}
+.settings-icon div {
+  position: relative;
+  width: 0.3em;
+  aspect-ratio: 1/1 !important;
+  outline: 0.1em solid;
+  margin: 0.2em 0;
+  border-radius: 99rem;
+
+  left: 0.4em;
+}
+.settings-icon div::before,
+.settings-icon div::after {
+  content: '';
+  display: block;
+  height: 0.1em;
+  width: 0.4em;
+  background-color: var(--gold-light);
+  border-radius: 99rem;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  translate: -101% -50%;
+}
+.settings-icon div::after {
+  width: 1.1em;
+  left: unset;
+  right: 0;
+  translate: 101% -50%;
+}
+.settings-icon div:nth-child(2) {
+  scale: -1 1;
+  left: 1.1em;
+}
+#settings-button::after {
+  content: '↜\00a0New!';
+  font-weight: bold;
+  font-size: 0.8em;
+  color: var(--white);
+  padding: 0.1em 0.3em;
+  filter: none;
+  text-shadow: var(--text-shadow-default);
+  border-radius: 0.25em;
+  background: var(--red);
+  box-shadow: var(--text-shadow-default);
+  animation: notify-shake 3s infinite;
+  rotate: -10deg;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  translate: 100% -20%;
+  pointer-events: none;
+}
+
+#settings {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100%;
+  height: 100%;
+  font-weight: bold;
+  text-shadow: var(--text-shadow-default);
+}
+#settings.open {
+  display: block;
+}
+.settings-body {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  translate: -50% 0;
+  background: var(--white-20);
+  backdrop-filter: blur(1em);
+  border-radius: 0.5em;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  max-width: calc(var(--max-content-width) / 1.5);
+  width: 75%;
+  box-shadow:
+    inset 0 -0.5rem 0 var(--black-20),
+    0 0.5rem 0.5rem var(--black-50);
+}
+.settings-body label {
+  text-align: left;
+}
+#settings::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(0.3em);
+  height: 100%;
+  width: 100%;
+}
+.close-btn-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  translate: 30% -40%;
+}
+#settings-close {
+  background: var(--red);
+  min-width: 0;
+  font-size: 2rem;
+}
+#settings.open .settings-body {
+  animation: pop-in 300ms ease-out;
+}
+.min-price-label {
+  display: flex;
+  gap: 0.5em;
+  align-items: end;
+}
+#min-price-val {
+  font-family: 'Young Serif', serif;
+  font-weight: normal;
+  color: var(--gold-light);
+}
+#min-price-val .currency:after {
+  content: var(--mode);
+}
+#min-price {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.1em;
+  font-size: 2rem;
+}
+#min-price-slider {
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+  appearance: none;
+  background: none;
+}
+#min-price-slider:focus {
+  outline: none;
+}
+#min-price-slider::-webkit-slider-runnable-track {
+  appearance: none;
+  background: var(--white-20);
+  height: 1em;
+  border-radius: 99rem;
+  box-shadow: inset 0 0.25rem 0 var(--black-20);
+}
+#min-price-slider::-moz-range-track {
+  appearance: none;
+  background: var(--white-20);
+  height: 1em;
+  border-radius: 99rem;
+  box-shadow: inset 0 0.25rem 0 var(--black-20);
+}
+#min-price-slider::-webkit-slider-thumb {
+  appearance: none;
+  background: var(--gold-light);
+  display: block;
+  height: 120%;
+  aspect-ratio: 1/1 !important;
+  translate: 0 calc(4% - 0.25em);
+  scale: 2;
+  border-radius: 99rem;
+  box-shadow:
+    0 0.125em 0.125em -0.125em var(--brown-50),
+    0 0.125em var(--gold),
+    0 0.125em 0.35em var(--brown-50);
+}
+#min-price-slider::-moz-range-thumb {
+  appearance: none;
+  background: var(--gold-light);
+  display: block;
+  height: 120%;
+  aspect-ratio: 1/1 !important;
+  translate: 0 calc(4% - 0.25em);
+  scale: 2;
+  border-radius: 99rem;
+  box-shadow:
+    0 0.125em 0.125em -0.125em var(--brown-50),
+    0 0.125em var(--gold),
+    0 0.125em 0.35em var(--brown-50);
+}
+#min-price-list {
+  z-index: -1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0.5rem 0.45rem 1rem;
+  font-family: 'Young Serif', serif;
+}
+input[type='range'],
+datalist,
+datalist option {
+  user-select: none;
+}
+option {
+  line-height: 0;
+  padding: 0;
+  width: 2px;
+  height: 2.5rem;
+  background: linear-gradient(to bottom, var(--white) 20%, transparent 20%);
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  text-shadow: none;
+  filter: drop-shadow(0.05em 0.05em var(--black-75));
+}
+option:nth-child(odd) {
+  background: linear-gradient(to bottom, var(--white) 40%, transparent 40%);
 }
