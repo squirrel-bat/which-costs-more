@@ -25,7 +25,7 @@ const FILTERS = {
     rare: true,
     mythic: true,
   },
-  legalities: {
+  formats: {
     standard: true,
     pioneer: true,
     modern: true,
@@ -42,11 +42,11 @@ const FILTERS = {
     }
     return result
   },
-  get selectedRarities() {
+  get selected_rarities() {
     return this._getSelectedEntriesOf(FILTERS.rarities)
   },
-  get selectedFormats() {
-    return this._getSelectedEntriesOf(FILTERS.legalities)
+  get selected_formats() {
+    return this._getSelectedEntriesOf(FILTERS.formats)
   },
 }
 const CARD_DATA = []
@@ -397,11 +397,11 @@ function wireUpSettings() {
   minPriceSlider.addEventListener('mouseup', minimumPriceFilterHandler)
   document.querySelectorAll('#rarities input').forEach((checkbox) => {
     checkbox.checked = FILTERS.rarities[checkbox.value]
-    checkbox.addEventListener('click', rarityFilterHandler)
+    checkbox.addEventListener('click', raritiesFilterHandler)
   })
-  document.querySelectorAll('#legalities input').forEach((checkbox) => {
-    checkbox.checked = FILTERS.legalities[checkbox.value]
-    checkbox.addEventListener('click', legalityFilterHandler)
+  document.querySelectorAll('#formats input').forEach((checkbox) => {
+    checkbox.checked = FILTERS.formats[checkbox.value]
+    checkbox.addEventListener('click', formatsFilterHandler)
   })
 }
 
@@ -412,35 +412,30 @@ function minimumPriceFilterHandler(ev) {
   applyFilters()
 }
 
-function rarityFilterHandler(ev) {
-  const checked = ev.target.checked
-  FILTERS.rarities[ev.target.value] = checked
-  switch (FILTERS.selectedRarities.length) {
+function keepLastToggleInGroupActive(groupName, checked) {
+  switch (FILTERS[`selected_${groupName}`].length) {
     case 1:
-      document.querySelector('#rarities input:checked').disabled = true
+      document.querySelector(`#${groupName} input:checked`).disabled = true
       break
     case 2:
       if (checked) {
-        document.querySelector('#rarities input:disabled').disabled = false
+        document.querySelector(`#${groupName} input:disabled`).disabled = false
       }
       break
   }
+}
+
+function raritiesFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.rarities[ev.target.value] = checked
+  keepLastToggleInGroupActive('rarities', checked)
   applyFilters()
 }
 
-function legalityFilterHandler(ev) {
+function formatsFilterHandler(ev) {
   const checked = ev.target.checked
-  FILTERS.legalities[ev.target.value] = checked
-  switch (FILTERS.selectedFormats.length) {
-    case 1:
-      document.querySelector('#legalities input:checked').disabled = true
-      break
-    case 2:
-      if (checked) {
-        document.querySelector('#legalities input:disabled').disabled = false
-      }
-      break
-  }
+  FILTERS.formats[ev.target.value] = checked
+  keepLastToggleInGroupActive('formats')
   applyFilters()
 }
 
@@ -458,7 +453,7 @@ function applyFilters() {
 
 function isLegal(cardLegalities) {
   return (
-    FILTERS.selectedFormats.filter(
+    FILTERS.selected_formats.filter(
       (format) => cardLegalities[format] == 'legal',
     ).length > 0
   )
