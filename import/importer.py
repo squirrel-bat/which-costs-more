@@ -37,6 +37,7 @@ def parse_data(data_json):
         {
             "name": card["name"],
             "img_uri": card["image_uris"]["normal"],
+            "scryfall_uri": card["scryfall_uri"],
             "prices": {
                 "usd": card["prices"]["usd"],
                 "eur": card["prices"]["eur"],
@@ -50,7 +51,6 @@ def parse_data(data_json):
                 "pauper": card["legalities"]["pauper"],
             },
             "rarity": card["rarity"],
-            "scryfall_uri": card["scryfall_uri"],
         }
         for card in data_json
         if is_valid_card(card)

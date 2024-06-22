@@ -19,6 +19,12 @@ let BULK_DATA = []
 let DATA = []
 const FILTERS = {
   minimumPrice: 0.0,
+  rarities: {
+    common: true,
+    uncommon: true,
+    rare: true,
+    mythic: true,
+  },
   legalities: {
     standard: true,
     pioneer: true,
@@ -27,14 +33,20 @@ const FILTERS = {
     commander: true,
     pauper: true,
   },
-  get legalFormats() {
-    const formats = []
-    for (const [format, legal] of Object.entries(FILTERS.legalities)) {
-      if (legal) {
-        formats.push(format)
+  _getSelectedEntriesOf(object) {
+    const result = []
+    for (const [key, selected] of Object.entries(object)) {
+      if (selected) {
+        result.push(key)
       }
     }
-    return formats
+    return result
+  },
+  get selectedRarities() {
+    return this._getSelectedEntriesOf(FILTERS.rarities)
+  },
+  get selectedFormats() {
+    return this._getSelectedEntriesOf(FILTERS.legalities)
   },
 }
 const CARD_DATA = []
@@ -362,33 +374,6 @@ function generateBGitems() {
   document.querySelector('html').appendChild(parentNode)
 }
 
-window.addEventListener('load', () => {
-  generateBGitems()
-  getBulkData().then((bulkData) => {
-    BULK_DATA = bulkData
-    DATA = BULK_DATA
-    window.addEventListener('keydown', handleTheCode)
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    wireUpButtons()
-    wireUpSettings()
-    updateMode()
-    setup()
-  })
-})
-
-let resizeTimeout = false
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout)
-  resizeTimeout = setTimeout(() => {
-    const bgItems = document.getElementById('bg-items')
-    bgItems.remove()
-    document.querySelector('html').appendChild(bgItems)
-  }, 50)
-})
-
-// Filtering
-
 function wireUpButtons() {
   document
     .getElementById('cheat-btn')
@@ -410,6 +395,10 @@ function wireUpSettings() {
     ).toFixed(2)
   })
   minPriceSlider.addEventListener('mouseup', minimumPriceFilterHandler)
+  document.querySelectorAll('#rarities input').forEach((checkbox) => {
+    checkbox.checked = FILTERS.rarities[checkbox.value]
+    checkbox.addEventListener('click', rarityFilterHandler)
+  })
   document.querySelectorAll('#legalities input').forEach((checkbox) => {
     checkbox.checked = FILTERS.legalities[checkbox.value]
     checkbox.addEventListener('click', legalityFilterHandler)
@@ -423,10 +412,26 @@ function minimumPriceFilterHandler(ev) {
   applyFilters()
 }
 
+function rarityFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.rarities[ev.target.value] = checked
+  switch (FILTERS.selectedRarities.length) {
+    case 1:
+      document.querySelector('#rarities input:checked').disabled = true
+      break
+    case 2:
+      if (checked) {
+        document.querySelector('#rarities input:disabled').disabled = false
+      }
+      break
+  }
+  applyFilters()
+}
+
 function legalityFilterHandler(ev) {
   const checked = ev.target.checked
   FILTERS.legalities[ev.target.value] = checked
-  switch (FILTERS.legalFormats.length) {
+  switch (FILTERS.selectedFormats.length) {
     case 1:
       document.querySelector('#legalities input:checked').disabled = true
       break
@@ -439,20 +444,48 @@ function legalityFilterHandler(ev) {
   applyFilters()
 }
 
-function isLegal(cardLegalities) {
-  return (
-    FILTERS.legalFormats.filter((format) => cardLegalities[format] == 'legal')
-      .length > 0
-  )
-}
-
 function applyFilters() {
   const currency = Object.keys(MODES).at(MODE)
   DATA = BULK_DATA.filter((el) => {
     return (
       Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
-      isLegal(el.legalities)
+      isLegal(el.legalities) &&
+      FILTERS.rarities[el.rarity]
     )
   })
   reset()
 }
+
+function isLegal(cardLegalities) {
+  return (
+    FILTERS.selectedFormats.filter(
+      (format) => cardLegalities[format] == 'legal',
+    ).length > 0
+  )
+}
+
+window.addEventListener('load', () => {
+  generateBGitems()
+  getBulkData().then((bulkData) => {
+    BULK_DATA = bulkData
+    DATA = BULK_DATA
+    window.addEventListener('keydown', handleTheCode)
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    wireUpButtons()
+    wireUpSettings()
+    updateMode()
+    setup()
+    document.querySelector('#settings-button').click()
+  })
+})
+
+let resizeTimeout = false
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    const bgItems = document.getElementById('bg-items')
+    bgItems.remove()
+    document.querySelector('html').appendChild(bgItems)
+  }, 50)
+})

@@ -4,7 +4,7 @@
     <title>Which Card Costs More?</title>
     <meta
       name="description"
-      content="A simple game about guessing which of two Magic: The Gathering cards costs more."
+      content="A simple game about guessing which of two Magic: The Gathering cards is more expensive."
     />
     <meta charset="utf-8" lang="en" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -101,7 +101,31 @@
             </datalist>
           </div>
 
-          <div>Include Formats:</div>
+          <div>Rarities:</div>
+          <div id="rarities" class="toggles">
+            <label>
+              Common
+              <input type="checkbox" id="toggle-common" value="common" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Uncommon
+              <input type="checkbox" id="toggle-uncommon" value="uncommon" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Rare
+              <input type="checkbox" id="toggle-rare" value="rare" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Mythic Rare
+              <input type="checkbox" id="toggle-mythic" value="mythic" />
+              <div class="toggle"></div>
+            </label>
+          </div>
+
+          <div>Formats:</div>
           <div id="legalities" class="toggles">
             <label>
               Commander
