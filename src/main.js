@@ -107,7 +107,7 @@ async function getBulkData() {
 function getRandomCardIndex(butNotThisOne = null) {
   const index = Math.floor(Math.random() * DATA.length)
   if (index === butNotThisOne) {
-    console.log("We hit the same index twice!? Let's try that again.")
+    console.log("We hit the same card twice!? Let's try that again...")
     return getRandomCardIndex(butNotThisOne)
   }
   return index
@@ -412,6 +412,20 @@ function minimumPriceFilterHandler(ev) {
   applyFilters()
 }
 
+function raritiesFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.rarities[ev.target.value] = checked
+  keepLastToggleInGroupActive('rarities', checked)
+  applyFilters()
+}
+
+function formatsFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.formats[ev.target.value] = checked
+  keepLastToggleInGroupActive('formats', checked)
+  applyFilters()
+}
+
 function keepLastToggleInGroupActive(groupName, checked) {
   switch (FILTERS[`selected_${groupName}`].length) {
     case 1:
@@ -423,20 +437,17 @@ function keepLastToggleInGroupActive(groupName, checked) {
       }
       break
   }
+  updateMythicPauperMode()
 }
 
-function raritiesFilterHandler(ev) {
-  const checked = ev.target.checked
-  FILTERS.rarities[ev.target.value] = checked
-  keepLastToggleInGroupActive('rarities', checked)
-  applyFilters()
-}
-
-function formatsFilterHandler(ev) {
-  const checked = ev.target.checked
-  FILTERS.formats[ev.target.value] = checked
-  keepLastToggleInGroupActive('formats')
-  applyFilters()
+function updateMythicPauperMode() {
+  const status =
+    document.getElementById('toggle-mythic').disabled &&
+    document.getElementById('toggle-pauper').disabled
+  document
+    .querySelectorAll('.mythic-pauper-mode')
+    .forEach((el) => el.classList.toggle('engaged', status))
+  document.getElementById('sick-track').pause()
 }
 
 function applyFilters() {
@@ -461,6 +472,7 @@ function isLegal(cardLegalities) {
 
 window.addEventListener('load', () => {
   generateBGitems()
+  document.querySelector('audio').volume = 0.5
   getBulkData().then((bulkData) => {
     BULK_DATA = bulkData
     DATA = BULK_DATA
@@ -471,7 +483,6 @@ window.addEventListener('load', () => {
     wireUpSettings()
     updateMode()
     setup()
-    document.querySelector('#settings-button').click()
   })
 })
 
