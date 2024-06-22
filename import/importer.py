@@ -4,7 +4,7 @@ import os
 import shutil
 import requests
 
-VERSION = 1.1
+VERSION = 1.2
 HR = "-" * shutil.get_terminal_size().columns
 API_URL = "https://api.scryfall.com/bulk-data/default-cards"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "../src/data.gzip")
@@ -15,7 +15,7 @@ def get_bulk_json():
     res = requests.get(API_URL).json()
     print(f"✔ Success")
     print(
-        f"Fetching Bulk JSON (~{round(res['size'] / (1024**2), 2)} MB) from {res['download_uri']}"
+        f"Fetching Bulk JSON (~ {round(res['size'] / (1024**2), 2)} MiB) from {res['download_uri']}"
     )
     return requests.get(res["download_uri"]).json()
 
@@ -37,7 +37,19 @@ def parse_data(data_json):
         {
             "name": card["name"],
             "img_uri": card["image_uris"]["normal"],
-            "prices": card["prices"],
+            "prices": {
+                "usd": card["prices"]["usd"],
+                "eur": card["prices"]["eur"],
+            },
+            "legalities": {
+                "standard": card["legalities"]["standard"],
+                "pioneer": card["legalities"]["pioneer"],
+                "modern": card["legalities"]["modern"],
+                "legacy": card["legalities"]["legacy"],
+                "commander": card["legalities"]["commander"],
+                "pauper": card["legalities"]["pauper"],
+            },
+            "rarity": card["rarity"],
             "scryfall_uri": card["scryfall_uri"],
         }
         for card in data_json
@@ -52,7 +64,9 @@ def write_gzip_file(output_file, data):
     with gzip.open(output_file, "w") as fp:
         fp.write(data.encode("utf-8"))
         fp.close()
-    print(f"{HR}\nFile written to {os.path.realpath(fp.name)}\n{HR}")
+    print(
+        f"{HR}\nFile (~ {round(os.path.getsize(output_file) / (1024**2), 2)} MiB) written to {os.path.realpath(fp.name)}\n{HR}"
+    )
 
 
 def main():

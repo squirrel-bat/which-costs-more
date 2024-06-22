@@ -19,6 +19,23 @@ let BULK_DATA = []
 let DATA = []
 const FILTERS = {
   minimumPrice: 0.0,
+  legalities: {
+    standard: true,
+    pioneer: true,
+    modern: true,
+    legacy: true,
+    commander: true,
+    pauper: true,
+  },
+  get legalFormats() {
+    const formats = []
+    for (const [format, legal] of Object.entries(FILTERS.legalities)) {
+      if (legal) {
+        formats.push(format)
+      }
+    }
+    return formats
+  },
 }
 const CARD_DATA = []
 const RESULTS = {
@@ -33,7 +50,7 @@ const RESULTS = {
     const draws = this._cards.filter(
       (card) => card.status === STATUS_DRAW,
     ).length
-    return wins / (this._cards.length - draws)
+    return wins / (this._cards.length - draws) || 0
   },
 }
 const STATUS_SUCCESS = 'success'
@@ -392,20 +409,50 @@ function wireUpSettings() {
       ev.target.value,
     ).toFixed(2)
   })
-  minPriceSlider.addEventListener('mouseup', applyMinimumPriceFilter)
+  minPriceSlider.addEventListener('mouseup', minimumPriceFilterHandler)
+  document.querySelectorAll('#legalities input').forEach((checkbox) => {
+    checkbox.checked = FILTERS.legalities[checkbox.value]
+    checkbox.addEventListener('click', legalityFilterHandler)
+  })
 }
 
-function applyMinimumPriceFilter(ev) {
+function minimumPriceFilterHandler(ev) {
   const value = ev.target.value
   if (Number(value) == Number(FILTERS.minimumPrice)) return
   FILTERS.minimumPrice = value
-  cutOffAtPrice(value)
-  reset()
+  applyFilters()
 }
 
-function cutOffAtPrice(minPrice = 0) {
-  const currency = Object.keys(MODES).at(MODE)
-  DATA = BULK_DATA.filter(
-    (el) => Number(el.prices[currency]) >= Number(minPrice),
+function legalityFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.legalities[ev.target.value] = checked
+  switch (FILTERS.legalFormats.length) {
+    case 1:
+      document.querySelector('#legalities input:checked').disabled = true
+      break
+    case 2:
+      if (checked) {
+        document.querySelector('#legalities input:disabled').disabled = false
+      }
+      break
+  }
+  applyFilters()
+}
+
+function isLegal(cardLegalities) {
+  return (
+    FILTERS.legalFormats.filter((format) => cardLegalities[format] == 'legal')
+      .length > 0
   )
+}
+
+function applyFilters() {
+  const currency = Object.keys(MODES).at(MODE)
+  DATA = BULK_DATA.filter((el) => {
+    return (
+      Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
+      isLegal(el.legalities)
+    )
+  })
+  reset()
 }
