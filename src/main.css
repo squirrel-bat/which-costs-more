@@ -193,13 +193,17 @@ a:hover {
 }
 
 #cheatmode {
-  font-size: 1.5rem;
+  font-size: 1em;
+  display: block;
   position: absolute;
-  bottom: 0;
-  left: 0;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: 100%;
+  padding-bottom: 0.1em;
   animation: var(--fade-in-default);
-  color: var(--red);
-  translate: 20% 90%;
+  background: var(--red);
+  box-shadow: inset 0 -0.25rem 0.25rem var(--black-50);
 }
 
 #cheat-data {
@@ -932,6 +936,7 @@ kbd.key.enter:before {
   cursor: pointer;
   appearance: none;
   background: none;
+  font-size: 0.42em;
 }
 #min-price-slider:focus {
   outline: none;
@@ -959,6 +964,7 @@ kbd.key.enter:before {
   translate: 0 calc(4% - 0.25em);
   scale: 2;
   border-radius: 99rem;
+  border: none;
   box-shadow:
     0 0.125em 0.125em -0.125em var(--brown-50),
     0 0.125em var(--gold),
@@ -973,6 +979,7 @@ kbd.key.enter:before {
   translate: 0 calc(4% - 0.25em);
   scale: 2;
   border-radius: 99rem;
+  border: none;
   box-shadow:
     0 0.125em 0.125em -0.125em var(--brown-50),
     0 0.125em var(--gold),
@@ -1018,6 +1025,7 @@ option:nth-child(odd) {
   font-size: 0.65em;
   display: flex;
   flex: 1 1 0;
+  min-width: 40%;
   justify-content: space-between;
   align-items: center;
   background: var(--white-10);
@@ -1147,12 +1155,15 @@ option:nth-child(odd) {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: inherit;
   padding: 0.1em 0 0.2em;
 }
 #sick-track {
   text-shadow: none;
+  height: calc(inherit - 0.3em);
 }
 #sick-beat.engaged {
+  /* Yes, I know, I know... */
   height: 1.4em !important;
 }
 html:has(.mythic-pauper-mode.engaged) {

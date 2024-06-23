@@ -300,7 +300,7 @@ function showCheatmodeEnabled() {
   const cheatInfo = document.createElement('span')
   cheatInfo.id = 'cheatmode'
   cheatInfo.innerText = 'Cheat Mode Activated!'
-  document.getElementById('title').prepend(cheatInfo)
+  document.querySelector('main').prepend(cheatInfo)
   Object.keys(MODES).forEach((key) =>
     document
       .querySelectorAll('.' + key)
@@ -394,7 +394,9 @@ function wireUpSettings() {
       ev.target.value,
     ).toFixed(2)
   })
-  minPriceSlider.addEventListener('mouseup', minimumPriceFilterHandler)
+  Array.from(['mouseup', 'touchend']).forEach((ev) =>
+    minPriceSlider.addEventListener(ev, minimumPriceFilterHandler),
+  )
   document.querySelectorAll('#rarities input').forEach((checkbox) => {
     checkbox.checked = FILTERS.rarities[checkbox.value]
     checkbox.addEventListener('click', raritiesFilterHandler)
