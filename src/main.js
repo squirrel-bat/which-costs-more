@@ -15,7 +15,40 @@ const THE_CODE = {
   ],
 }
 const FILE_URI = './data.gzip'
+let BULK_DATA = []
 let DATA = []
+const FILTERS = {
+  minimumPrice: 0.0,
+  rarities: {
+    common: true,
+    uncommon: true,
+    rare: true,
+    mythic: true,
+  },
+  formats: {
+    standard: true,
+    pioneer: true,
+    modern: true,
+    legacy: true,
+    commander: true,
+    pauper: true,
+  },
+  _getSelectedEntriesOf(object) {
+    const result = []
+    for (const [key, selected] of Object.entries(object)) {
+      if (selected) {
+        result.push(key)
+      }
+    }
+    return result
+  },
+  get selected_rarities() {
+    return this._getSelectedEntriesOf(FILTERS.rarities)
+  },
+  get selected_formats() {
+    return this._getSelectedEntriesOf(FILTERS.formats)
+  },
+}
 const CARD_DATA = []
 const RESULTS = {
   _cards: [],
@@ -29,7 +62,7 @@ const RESULTS = {
     const draws = this._cards.filter(
       (card) => card.status === STATUS_DRAW,
     ).length
-    return wins / (this._cards.length - draws)
+    return wins / (this._cards.length - draws) || 0
   },
 }
 const STATUS_SUCCESS = 'success'
@@ -66,15 +99,15 @@ async function getBulkData() {
     mode: 'no-cors',
   })
   const blob = await response.blob()
-  const stream = await blob.stream()
-  const decompressed = await stream.pipeThrough(new DecompressionStream('gzip'))
+  const stream = blob.stream()
+  const decompressed = stream.pipeThrough(new DecompressionStream('gzip'))
   return new Response(decompressed).json()
 }
 
 function getRandomCardIndex(butNotThisOne = null) {
   const index = Math.floor(Math.random() * DATA.length)
   if (index === butNotThisOne) {
-    console.log("We hit the same index twice!? Let's try that again.")
+    console.log("We hit the same card twice!? Let's try that again...")
     return getRandomCardIndex(butNotThisOne)
   }
   return index
@@ -123,9 +156,9 @@ function getCardStatus(selectedCard, otherCard) {
     Number(otherCard.prices[currency])
     ? STATUS_SUCCESS
     : Number(selectedCard.prices[currency]) ===
-      Number(otherCard.prices[currency])
-    ? STATUS_DRAW
-    : STATUS_FAILURE
+        Number(otherCard.prices[currency])
+      ? STATUS_DRAW
+      : STATUS_FAILURE
 }
 
 function evaulateAnswer(id) {
@@ -267,7 +300,7 @@ function showCheatmodeEnabled() {
   const cheatInfo = document.createElement('span')
   cheatInfo.id = 'cheatmode'
   cheatInfo.innerText = 'Cheat Mode Activated!'
-  document.getElementById('title').prepend(cheatInfo)
+  document.querySelector('main').prepend(cheatInfo)
   Object.keys(MODES).forEach((key) =>
     document
       .querySelectorAll('.' + key)
@@ -308,6 +341,9 @@ function handleKeyUp(e) {
         .querySelector('#mode-toggle')
         .dispatchEvent(new Event('mousedown'))
       break
+    case 'f':
+      document.querySelector('#settings-button').click()
+      break
     case '1':
       document.querySelector('#card-0 img').click()
       break
@@ -316,6 +352,9 @@ function handleKeyUp(e) {
       break
     case 'Enter':
       document.querySelector('#reset-btn').click()
+      break
+    case 'Escape':
+      document.querySelector('#settings-close').click()
       break
   }
 }
@@ -335,16 +374,115 @@ function generateBGitems() {
   document.querySelector('html').appendChild(parentNode)
 }
 
+function wireUpButtons() {
+  document
+    .getElementById('cheat-btn')
+    .addEventListener('click', showCheatmodeEnabled)
+  const settingsElement = document.getElementById('settings')
+  document.getElementById('settings-button').addEventListener('click', () => {
+    settingsElement.classList.add('open')
+  })
+  document.getElementById('settings-close').addEventListener('click', () => {
+    settingsElement.classList.remove('open')
+  })
+}
+
+function wireUpSettings() {
+  const minPriceSlider = document.getElementById('min-price-slider')
+  minPriceSlider.addEventListener('input', (ev) => {
+    document.querySelector('#min-price-val .value').innerText = Number(
+      ev.target.value,
+    ).toFixed(2)
+  })
+  Array.from(['mouseup', 'touchend']).forEach((ev) =>
+    minPriceSlider.addEventListener(ev, minimumPriceFilterHandler),
+  )
+  document.querySelectorAll('#rarities input').forEach((checkbox) => {
+    checkbox.checked = FILTERS.rarities[checkbox.value]
+    checkbox.addEventListener('click', raritiesFilterHandler)
+  })
+  document.querySelectorAll('#formats input').forEach((checkbox) => {
+    checkbox.checked = FILTERS.formats[checkbox.value]
+    checkbox.addEventListener('click', formatsFilterHandler)
+  })
+}
+
+function minimumPriceFilterHandler(ev) {
+  const value = ev.target.value
+  if (Number(value) == Number(FILTERS.minimumPrice)) return
+  FILTERS.minimumPrice = value
+  applyFilters()
+}
+
+function raritiesFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.rarities[ev.target.value] = checked
+  keepLastToggleInGroupActive('rarities', checked)
+  applyFilters()
+}
+
+function formatsFilterHandler(ev) {
+  const checked = ev.target.checked
+  FILTERS.formats[ev.target.value] = checked
+  keepLastToggleInGroupActive('formats', checked)
+  applyFilters()
+}
+
+function keepLastToggleInGroupActive(groupName, checked) {
+  switch (FILTERS[`selected_${groupName}`].length) {
+    case 1:
+      document.querySelector(`#${groupName} input:checked`).disabled = true
+      break
+    case 2:
+      if (checked) {
+        document.querySelector(`#${groupName} input:disabled`).disabled = false
+      }
+      break
+  }
+  updateMythicPauperMode()
+}
+
+function updateMythicPauperMode() {
+  const status =
+    document.getElementById('toggle-mythic').disabled &&
+    document.getElementById('toggle-pauper').disabled
+  document
+    .querySelectorAll('.mythic-pauper-mode')
+    .forEach((el) => el.classList.toggle('engaged', status))
+  document.getElementById('sick-track').pause()
+}
+
+function applyFilters() {
+  const currency = Object.keys(MODES).at(MODE)
+  DATA = BULK_DATA.filter((el) => {
+    return (
+      Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
+      isLegal(el.legalities) &&
+      FILTERS.rarities[el.rarity]
+    )
+  })
+  reset()
+}
+
+function isLegal(cardLegalities) {
+  return (
+    FILTERS.selected_formats.filter(
+      (format) => cardLegalities[format] == 'legal',
+    ).length > 0
+  )
+}
+
 window.addEventListener('load', () => {
   generateBGitems()
+  document.querySelector('audio').volume = 0.5
   getBulkData().then((bulkData) => {
-    DATA = bulkData
+    BULK_DATA = bulkData
+    DATA = BULK_DATA
     window.addEventListener('keydown', handleTheCode)
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
-    document
-      .getElementById('cheat-btn')
-      .addEventListener('click', showCheatmodeEnabled)
+    wireUpButtons()
+    wireUpSettings()
     updateMode()
     setup()
   })

@@ -2,6 +2,10 @@
 <html lang="en">
   <head>
     <title>Which Card Costs More?</title>
+    <meta
+      name="description"
+      content="A simple game about guessing which of two Magic: The Gathering cards is more expensive."
+    />
     <meta charset="utf-8" lang="en" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta
@@ -25,6 +29,12 @@
       sizes="16x16"
       type="image/png"
     />
+    <link
+      href="favicon.png"
+      rel="shortcut icon"
+      sizes="48x48"
+      type="image/png"
+    />
     <link href="./site.webmanifest" rel="manifest" />
     <link as="font" crossorigin href="./AmaticSC-Regular.ttf" rel="preload" />
     <link as="font" crossorigin href="./YoungSerif-Regular.ttf" rel="preload" />
@@ -42,10 +52,120 @@
           click to swap currency <span class="hint-arrow">↝</span>
           <kbd class="display-none key letter" style="--key: 'C'"></kbd>
         </span>
+        <div id="settings-button">
+          <div class="settings-icon">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div>Filters!</div>
+          <kbd class="display-none key letter" style="--key: 'F'"></kbd>
+        </div>
       </h1>
+
+      <div id="settings">
+        <div class="settings-body">
+          <div class="close-btn-wrapper">
+            <button id="settings-close">✖</button>
+          </div>
+
+          <label class="min-price-label" for="min-price-slider">
+            Price Starting At:<span id="min-price-val">
+              <span class="currency"></span>&nbsp;<span class="value"
+                >0.00</span
+              >
+            </span>
+          </label>
+          <div id="min-price">
+            <input
+              type="range"
+              id="min-price-slider"
+              value="0"
+              step=".1"
+              min="0"
+              max="5"
+              draggable="false"
+            />
+            <datalist id="min-price-list">
+              <option value="0" label="0.00"></option>
+              <option value=".5"></option>
+              <option value="1" label="1.00"></option>
+              <option value="1.5"></option>
+              <option value="2" label="2.00"></option>
+              <option value="2.5"></option>
+              <option value="3" label="3.00"></option>
+              <option value="3.5"></option>
+              <option value="4" label="4.00"></option>
+              <option value="4.5"></option>
+              <option value="5" label="5.00"></option>
+            </datalist>
+          </div>
+
+          <div>Rarities:</div>
+          <div id="rarities" class="toggles">
+            <label>
+              Common
+              <input type="checkbox" id="toggle-common" value="common" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Uncommon
+              <input type="checkbox" id="toggle-uncommon" value="uncommon" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Rare
+              <input type="checkbox" id="toggle-rare" value="rare" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Mythic Rare
+              <input type="checkbox" id="toggle-mythic" value="mythic" />
+              <div class="toggle"></div>
+            </label>
+          </div>
+
+          <div>Formats:</div>
+          <div id="formats" class="toggles">
+            <label>
+              Commander
+              <input type="checkbox" id="toggle-commander" value="commander" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Standard
+              <input type="checkbox" id="toggle-standard" value="standard" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Pioneer
+              <input type="checkbox" id="toggle-pioneer" value="pioneer" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Modern <input type="checkbox" id="toggle-modern" value="modern" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Pauper <input type="checkbox" id="toggle-pauper" value="pauper" />
+              <div class="toggle"></div>
+            </label>
+            <label>
+              Legacy <input type="checkbox" id="toggle-legacy" value="legacy" />
+              <div class="toggle"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="lets-goo" class="mythic-pauper-mode">
+        <div>MYTHIC PAUPER MODE</div>
+      </div>
+
       <span class="hint hint-controls">
         Hold <kbd>[Shift]</kbd> to see keyboard controls
       </span>
+
       <div class="row">
         <div class="col">
           <figure class="card" id="card-0">
@@ -111,6 +231,15 @@
         </template>
       </div>
     </main>
+    <div id="sick-beat" class="mythic-pauper-mode">
+      <div>
+        <span>SICK BEAT:&nbsp;</span>
+        <audio id="sick-track" preload="none" controls loop>
+          <source src="./mythic-mode.mp3" type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+    </div>
     <footer>
       <span id="copyright"
         >© 2023 <a href="https://ko-fi.com/squirrelbat">squirrel-bat</a></span
