@@ -1127,7 +1127,7 @@ option:nth-child(odd) {
     rotateZ 20s linear infinite;
 }
 #lets-goo.engaged {
-  opacity: 0.5;
+  opacity: 0.75;
 }
 #sick-beat {
   order: -1;
@@ -1168,4 +1168,16 @@ option:nth-child(odd) {
 }
 html:has(.mythic-pauper-mode.engaged) {
   background: center / cover url('supahotloop.webp');
+}
+html:has(.mythic-pauper-mode.engaged)::after {
+  z-index: -1;
+  content: '';
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  opacity: 0.5;
+  pointer-events: none;
+  animation: party 0.75s linear infinite;
 }

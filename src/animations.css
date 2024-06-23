@@ -110,3 +110,15 @@
     transform: translate(0, 5%);
   }
 }
+@keyframes party {
+  0%,
+  100% {
+    background: #f00;
+  }
+  33% {
+    background: #0f0;
+  }
+  66% {
+    background: #00f;
+  }
+}
