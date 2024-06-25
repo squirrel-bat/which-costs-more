@@ -18,6 +18,7 @@ const FILE_URI = './data.gzip'
 let BULK_DATA = []
 let DATA = []
 const FILTERS = {
+  basicLands: true,
   minimumPrice: 0.0,
   rarities: {
     common: true,
@@ -388,6 +389,12 @@ function wireUpButtons() {
 }
 
 function wireUpSettings() {
+  const basicLandsToggle = document.getElementById('toggle-basic-lands')
+  basicLandsToggle.checked = FILTERS.basicLands
+  basicLandsToggle.addEventListener('click', (ev) => {
+    FILTERS.basicLands = ev.target.checked
+    applyFilters()
+  })
   const minPriceSlider = document.getElementById('min-price-slider')
   minPriceSlider.addEventListener('input', (ev) => {
     document.querySelector('#min-price-val .value').innerText = Number(
@@ -428,6 +435,32 @@ function formatsFilterHandler(ev) {
   applyFilters()
 }
 
+function applyFilters() {
+  const currency = Object.keys(MODES).at(MODE)
+  DATA = BULK_DATA.filter((el) => {
+    return (
+      Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
+      isLegal(el.legalities) &&
+      (FILTERS.basicLands || !el.isBasicLand) &&
+      FILTERS.rarities[el.rarity]
+    )
+  })
+  reset()
+}
+
+function isLegal(cardLegalities) {
+  return (
+    FILTERS.selected_formats.filter(
+      (format) => cardLegalities[format] == 'legal',
+    ).length > 0
+  )
+}
+
+function isBasicLand(cardName) {
+  const landNames = ['Plains', 'Island', 'Swamp', 'Mountain', 'Forest']
+  return landNames.includes(cardName)
+}
+
 function keepLastToggleInGroupActive(groupName, checked) {
   switch (FILTERS[`selected_${groupName}`].length) {
     case 1:
@@ -452,32 +485,15 @@ function updateMythicPauperMode() {
   document.getElementById('sick-track').pause()
 }
 
-function applyFilters() {
-  const currency = Object.keys(MODES).at(MODE)
-  DATA = BULK_DATA.filter((el) => {
-    return (
-      Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
-      isLegal(el.legalities) &&
-      FILTERS.rarities[el.rarity]
-    )
-  })
-  reset()
-}
-
-function isLegal(cardLegalities) {
-  return (
-    FILTERS.selected_formats.filter(
-      (format) => cardLegalities[format] == 'legal',
-    ).length > 0
-  )
-}
-
 window.addEventListener('load', () => {
   generateBGitems()
   document.querySelector('audio').volume = 0.5
   getBulkData().then((bulkData) => {
     BULK_DATA = bulkData
-    DATA = BULK_DATA
+    DATA = BULK_DATA.map((card) => {
+      card.isBasicLand = isBasicLand(card.name)
+      return card
+    })
     window.addEventListener('keydown', handleTheCode)
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
