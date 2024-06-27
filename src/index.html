@@ -40,6 +40,7 @@
     <link as="font" crossorigin href="./YoungSerif-Regular.ttf" rel="preload" />
 
     <link href="./animations.css" rel="stylesheet" />
+    <link href="./keyrune.css" rel="stylesheet" />
     <link href="./main.css" rel="stylesheet" />
     <script src="./main.js"></script>
   </head>
@@ -180,10 +181,6 @@
         <div>MYTHIC PAUPER MODE</div>
       </div>
 
-      <span class="hint hint-controls">
-        Hold <kbd>[Shift]</kbd> to see keyboard controls
-      </span>
-
       <div class="row">
         <div class="col">
           <figure class="card" id="card-0">
@@ -204,6 +201,20 @@
           <kbd class="key display-none" style="--key: '2'"></kbd>
         </div>
       </div>
+
+      <div class="row set-infos">
+        <div id="set-info-0" class="col">
+          <div class="set-info-row">
+            <span><i class="ss"></i></span><span class="value"></span>
+          </div>
+        </div>
+        <div id="set-info-1" class="col">
+          <div class="set-info-row">
+            <span><i class="ss"></i></span><span class="value"></span>
+          </div>
+        </div>
+      </div>
+
       <div class="row display-none" id="cheat-data">
         <div class="col">
           <div class="price-row" id="cheat-prices-0">
@@ -248,6 +259,10 @@
           </div>
         </template>
       </div>
+
+      <span class="hint hint-controls">
+        Hold <kbd>[Shift]</kbd> to see keyboard controls
+      </span>
     </main>
     <div id="sick-beat" class="mythic-pauper-mode">
       <div>

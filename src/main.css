@@ -191,7 +191,36 @@ a:hover {
   z-index: -1;
   translate: -2% 0;
 }
-
+.set-infos {
+  font-family: 'Young Serif', serif;
+  font-size: 1rem;
+  text-shadow: var(--text-shadow-default);
+  padding: 1rem 0;
+  align-items: stretch !important;
+}
+.set-infos .col {
+  gap: 0;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background: var(--black-20);
+}
+.set-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5em;
+}
+.set-info-row .ss {
+  font-size: 3em;
+  text-shadow: none;
+  filter: drop-shadow(1px 0 0 var(--white)) drop-shadow(0 1px 0 var(--white))
+    drop-shadow(0 -1px 0 var(--white)) drop-shadow(-1px 0 0 var(--white))
+    drop-shadow(var(--text-shadow-default));
+}
+.set-info-row .value {
+  flex: 1;
+}
 #cheatmode {
   font-size: 1em;
   display: block;
@@ -217,7 +246,6 @@ a:hover {
 .price-row {
   display: flex;
   justify-content: space-evenly;
-  margin-top: 1rem;
   padding: 0.75rem 0;
   border-radius: 1rem;
   background: var(--black-20);
@@ -880,7 +908,7 @@ kbd.key.enter:before {
 }
 .settings-modal {
   position: absolute;
-  top: 15rem;
+  top: 10rem;
   left: 50%;
   translate: -50% 0;
   background: var(--white-20);

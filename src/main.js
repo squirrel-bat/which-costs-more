@@ -181,6 +181,20 @@ function evaulateAnswer(id) {
   return resultObject
 }
 
+function renderSetInfos() {
+  CARD_DATA.forEach((card, i) => {
+    if (!card.hasOwnProperty('set')) return
+    const field = document.getElementById('set-info-' + i)
+    field.querySelector('i').className =
+      `ss ss-${card.set.code.toLowerCase()} ss-${card.rarity}`
+    if (card.rarity != 'common') {
+      field.querySelector('i').className += ' ss-grad'
+    }
+    field.querySelector('.value').textContent =
+      `${card.set.name} (${card.set.code})`
+  })
+}
+
 function renderPrices() {
   CARD_DATA.forEach((card, i) => {
     if (!card.hasOwnProperty('prices')) return
@@ -294,6 +308,7 @@ function setup() {
   const firstCardIndex = loadCard(0)
   loadCard(1, firstCardIndex)
   activateAnswers()
+  renderSetInfos()
   renderPrices()
 }
 

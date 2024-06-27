@@ -8,12 +8,14 @@ VERSION = 1.2
 HR = "-" * shutil.get_terminal_size().columns
 API_URL = "https://api.scryfall.com/bulk-data/default-cards"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "../src/data.gzip")
+GREEN = "\033[92m"
+ENDCOLOR = "\033[0m"
 
 
 def get_bulk_json():
     print(f"Fetching Bulk URI from {API_URL}")
     res = requests.get(API_URL).json()
-    print(f"✔ Success")
+    print(f"{GREEN}✔ Success{ENDCOLOR}")
     print(
         f"Fetching Bulk JSON (~ {round(res['size'] / (1024**2), 2)} MiB) from {res['download_uri']}"
     )
@@ -51,6 +53,10 @@ def parse_data(data_json):
                 "pauper": card["legalities"]["pauper"],
             },
             "rarity": card["rarity"],
+            "set": {
+                "name": card["set_name"],
+                "code": card["set"].upper(),
+            },
         }
         for card in data_json
         if is_valid_card(card)
@@ -72,7 +78,7 @@ def write_gzip_file(output_file, data):
 def main():
     print(f"{HR}\nBulk Importer v{VERSION}\n{HR}")
     data_json = get_bulk_json()
-    print(f"✔ Success\n{HR}\nRead:    {len(data_json)} cards")
+    print(f"{GREEN}✔ Success{ENDCOLOR}\n{HR}\nRead:    {len(data_json)} cards")
     data = parse_data(data_json)
     write_gzip_file(OUTPUT_FILE, data)
 
