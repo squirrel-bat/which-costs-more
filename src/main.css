@@ -236,6 +236,11 @@ a:hover {
     brightness(0.75) !important;
   --border-color: var(--black) !important;
 }
+.set-special {
+  --coloring: invert(0.5) sepia(1) saturate(3) hue-rotate(-120deg)
+    brightness(0.75) !important;
+  --border-color: var(--black) !important;
+}
 .set-info-row .value {
   flex: 1;
 }
@@ -374,7 +379,7 @@ a:hover {
   z-index: 0 !important;
 }
 
-.card img[src=''] {
+img[src=''] {
   visibility: hidden;
 }
 
