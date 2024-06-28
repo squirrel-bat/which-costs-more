@@ -15,6 +15,7 @@ const THE_CODE = {
   ],
 }
 const FILE_URI = './data.gzip'
+let SETS = []
 let BULK_DATA = []
 let DATA = []
 const FILTERS = {
@@ -185,11 +186,10 @@ function renderSetInfos() {
   CARD_DATA.forEach((card, i) => {
     if (!card.hasOwnProperty('set')) return
     const field = document.getElementById('set-info-' + i)
-    field.querySelector('i').className =
-      `ss ss-${card.set.code.toLowerCase()} ss-${card.rarity}`
-    if (card.rarity != 'common') {
-      field.querySelector('i').className += ' ss-grad'
-    }
+    field.querySelector('img').src = SETS.find(
+      (el) => el.code == card.set.code,
+    ).icon
+    field.querySelector('img').className = 'set-' + card.rarity
     field.querySelector('.value').textContent =
       `${card.set.name} (${card.set.code})`
   })
@@ -503,8 +503,9 @@ function updateMythicPauperMode() {
 window.addEventListener('load', () => {
   generateBGitems()
   document.querySelector('audio').volume = 0.5
-  getBulkData().then((bulkData) => {
-    BULK_DATA = bulkData
+  getBulkData().then((fetchedData) => {
+    SETS = fetchedData['sets']
+    BULK_DATA = fetchedData['data']
     DATA = BULK_DATA.map((card) => {
       card.isBasicLand = isBasicLand(card.name)
       return card
@@ -528,3 +529,7 @@ window.addEventListener('resize', () => {
     document.querySelector('html').appendChild(bgItems)
   }, 50)
 })
+
+async function fetchSets() {
+  return fetch(SETS_URI).then((response) => response.json())
+}

@@ -200,8 +200,9 @@ a:hover {
 }
 .set-infos .col {
   gap: 0;
+  min-height: 5rem;
   justify-content: center;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
   border-radius: 1rem;
   background: var(--black-20);
 }
@@ -211,12 +212,29 @@ a:hover {
   align-items: center;
   gap: 0.5em;
 }
-.set-info-row .ss {
-  font-size: 3em;
-  text-shadow: none;
-  filter: drop-shadow(1px 0 0 var(--white)) drop-shadow(0 1px 0 var(--white))
-    drop-shadow(0 -1px 0 var(--white)) drop-shadow(-1px 0 0 var(--white))
+.set-info-row img {
+  --coloring: ;
+  --border-color: var(--white);
+  max-height: 2.5em;
+  max-width: 2.5em;
+  filter: var(--coloring) drop-shadow(1px 0 0 var(--border-color))
+    drop-shadow(0 1px 0 var(--border-color))
+    drop-shadow(0 -1px 0 var(--border-color))
+    drop-shadow(-1px 0 0 var(--border-color))
     drop-shadow(var(--text-shadow-default));
+}
+.set-uncommon {
+  --coloring: invert(0.5) sepia(1) saturate(0.5) hue-rotate(180deg) !important;
+  --border-color: var(--black) !important;
+}
+.set-rare {
+  --coloring: invert(0.5) sepia(1) saturate(2) hue-rotate(-5deg) !important;
+  --border-color: var(--black) !important;
+}
+.set-mythic {
+  --coloring: invert(0.5) sepia(1) saturate(10) hue-rotate(-30deg)
+    brightness(0.75) !important;
+  --border-color: var(--black) !important;
 }
 .set-info-row .value {
   flex: 1;
