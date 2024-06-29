@@ -383,26 +383,13 @@ img[src=''] {
   visibility: hidden;
 }
 
-/* TODO: Enable when FF support is sorted out */
-/*.card:has(img[src='']) {*/
-/*  background: var(--black-20);*/
-/*}*/
-/*.card:has(img:not([src=''])):before,*/
-/*.card:has(img:not([src=''])):after {*/
-/*  display: none;*/
-/*}*/
-main:not(.results) .card:not(.active),
-.card.loading {
+.card:has(img[src='']) {
   background: var(--black-20);
 }
-
-.card.active:not(.loading):before,
-.card.active:not(.loading):after,
-.results .card:before {
+.card:has(img:not([src=''])):before,
+.card:has(img:not([src=''])):after {
   display: none;
 }
-
-/* END TODO */
 
 .col:hover .card.active:not(.loading) img {
   box-shadow:
