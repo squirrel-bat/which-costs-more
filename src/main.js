@@ -18,7 +18,14 @@ const FILE_URI = './data.gzip'
 let SETS = []
 let BULK_DATA = []
 let DATA = []
+const DATA_AGGREGATED = {
+  byPrice: {
+    lowest: [],
+    highest: [],
+  },
+}
 const FILTERS = {
+  pricingType: 'all',
   basicLands: true,
   minimumPrice: 0.0,
   rarities: {
@@ -81,8 +88,12 @@ const MODES = {
 }
 let MODE = 0
 
+function getCurrency() {
+  return Object.keys(MODES).at(MODE)
+}
+
 function updateMode() {
-  const currency = Object.keys(MODES).at(MODE)
+  const currency = getCurrency()
   document
     .querySelector(':root')
     .style.setProperty('--mode', '"' + MODES[currency] + '"')
@@ -134,7 +145,7 @@ function loadCard(id = 0, butNotThatIndex) {
   })
   img.addEventListener('click', () => answer(id))
   img.alt = card.name
-  img.src = card['img_uri']
+  img.src = card.img_uri
   replayAnimations(element)
   return index
 }
@@ -153,7 +164,7 @@ function getCardStatus(selectedCard, otherCard) {
   ) {
     throw new Error('Missing prices on card objects.')
   }
-  const currency = Object.keys(MODES).at(MODE)
+  const currency = getCurrency()
   return Number(selectedCard.prices[currency]) >
     Number(otherCard.prices[currency])
     ? STATUS_SUCCESS
@@ -174,9 +185,9 @@ function evaulateAnswer(id) {
   }
   const resultObject = {
     name: selectedCard.name,
-    url: selectedCard['scryfall_uri'],
+    url: selectedCard.scryfall_uri,
     status: getCardStatus(selectedCard, otherCard),
-    versus: { name: otherCard.name, url: otherCard['scryfall_uri'] },
+    versus: { name: otherCard.name, url: otherCard.scryfall_uri },
   }
   RESULTS.add(resultObject)
   return resultObject
@@ -404,12 +415,6 @@ function wireUpButtons() {
 }
 
 function wireUpSettings() {
-  const basicLandsToggle = document.getElementById('toggle-basic-lands')
-  basicLandsToggle.checked = FILTERS.basicLands
-  basicLandsToggle.addEventListener('click', (ev) => {
-    FILTERS.basicLands = ev.target.checked
-    applyFilters()
-  })
   const minPriceSlider = document.getElementById('min-price-slider')
   minPriceSlider.addEventListener('input', (ev) => {
     document.querySelector('#min-price-val .value').innerText = Number(
@@ -419,6 +424,19 @@ function wireUpSettings() {
   Array.from(['mouseup', 'touchend']).forEach((ev) =>
     minPriceSlider.addEventListener(ev, minimumPriceFilterHandler),
   )
+  const basicLandsToggle = document.getElementById('toggle-basic-lands')
+  basicLandsToggle.checked = FILTERS.basicLands
+  basicLandsToggle.addEventListener('click', (ev) => {
+    FILTERS.basicLands = ev.target.checked
+    applyFilters()
+  })
+  document.querySelectorAll('#pricing-type input').forEach((radio) => {
+    radio.checked = radio.value == FILTERS.pricingType
+    radio.addEventListener('click', (ev) => {
+      FILTERS.pricingType = ev.target.value
+      applyFilters()
+    })
+  })
   document.querySelectorAll('#rarities input').forEach((checkbox) => {
     checkbox.checked = FILTERS.rarities[checkbox.value]
     checkbox.addEventListener('click', raritiesFilterHandler)
@@ -451,15 +469,19 @@ function formatsFilterHandler(ev) {
 }
 
 function applyFilters() {
-  const currency = Object.keys(MODES).at(MODE)
-  DATA = BULK_DATA.filter((el) => {
+  const currency = getCurrency()
+  const allFiltersFunc = (el) => {
     return (
       Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
       isLegal(el.legalities) &&
       (FILTERS.basicLands || !el.isBasicLand) &&
       FILTERS.rarities[el.rarity]
     )
-  })
+  }
+  DATA =
+    FILTERS.pricingType == 'all'
+      ? BULK_DATA.filter(allFiltersFunc)
+      : DATA_AGGREGATED.byPrice[FILTERS.pricingType].filter(allFiltersFunc)
   reset()
 }
 
@@ -500,23 +522,47 @@ function updateMythicPauperMode() {
   document.getElementById('sick-track').pause()
 }
 
+function prepareData(fetchedData) {
+  SETS = fetchedData.sets
+  BULK_DATA = fetchedData.data.map((card) => {
+    card.isBasicLand = isBasicLand(card.name)
+    return card
+  })
+  DATA = BULK_DATA
+
+  const currency = getCurrency()
+  let result = { lowest: {}, highest: {} }
+  for (const [idx, card] of Object.entries(DATA)) {
+    const price = Number(card.prices[currency])
+    if (!result.lowest[card.name] || price < result.lowest[card.name].price) {
+      result.lowest[card.name] = { index: Number(idx), price }
+    }
+    if (!result.highest[card.name] || price > result.highest[card.name].price) {
+      result.highest[card.name] = { index: Number(idx), price }
+    }
+  }
+  DATA_AGGREGATED.byPrice = {
+    lowest: Array.from(Object.values(result.lowest)).map(
+      (value) => BULK_DATA[value.index],
+    ),
+    highest: Array.from(Object.values(result.highest)).map(
+      (value) => BULK_DATA[value.index],
+    ),
+  }
+}
+
 window.addEventListener('load', () => {
   generateBGitems()
   document.querySelector('audio').volume = 0.5
   getBulkData().then((fetchedData) => {
-    SETS = fetchedData['sets']
-    BULK_DATA = fetchedData['data']
-    DATA = BULK_DATA.map((card) => {
-      card.isBasicLand = isBasicLand(card.name)
-      return card
-    })
-    window.addEventListener('keydown', handleTheCode)
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
+    prepareData(fetchedData)
     wireUpButtons()
     wireUpSettings()
     updateMode()
     setup()
+    window.addEventListener('keydown', handleTheCode)
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
   })
 })
 
@@ -529,7 +575,3 @@ window.addEventListener('resize', () => {
     document.querySelector('html').appendChild(bgItems)
   }, 50)
 })
-
-async function fetchSets() {
-  return fetch(SETS_URI).then((response) => response.json())
-}

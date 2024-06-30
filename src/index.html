@@ -69,15 +69,19 @@
             <button id="settings-close">✖</button>
           </div>
           <div class="settings-body">
-            <div class="toggles">
+            <div id="pricing-type" class="radios">
+              <span>Printing:</span>
               <label>
-                include Basic Lands
-                <input
-                  type="checkbox"
-                  id="toggle-basic-lands"
-                  value="basic-lands"
-                />
-                <div class="toggle"></div>
+                Cheapest
+                <input type="radio" name="pricing-type" value="lowest" />
+              </label>
+              <label>
+                Any
+                <input type="radio" name="pricing-type" value="all" />
+              </label>
+              <label>
+                Priciest
+                <input type="radio" name="pricing-type" value="highest" />
               </label>
             </div>
 
@@ -88,7 +92,7 @@
                 >
               </span>
             </label>
-            <div id="min-price">
+            <div class="range-slider">
               <input
                 type="range"
                 id="min-price-slider"
@@ -112,6 +116,19 @@
                 <option value="5" label="5.00"></option>
               </datalist>
             </div>
+
+            <div class="toggles">
+              <label>
+                Include Basic Lands
+                <input
+                  type="checkbox"
+                  id="toggle-basic-lands"
+                  value="basic-lands"
+                />
+                <div class="toggle"></div>
+              </label>
+            </div>
+
             <div>Rarities:</div>
             <div id="rarities" class="toggles">
               <label>
