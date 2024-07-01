@@ -117,6 +117,7 @@ body {
   font-size: 0.75rem;
   margin: 0;
   padding: 1rem;
+  padding-bottom: 2rem;
   color: var(--black-50);
 }
 
@@ -186,10 +187,15 @@ a:hover {
   display: none;
 }
 
-.hint-controls {
+.hint-fixed {
   position: fixed;
   z-index: -1;
   translate: -2% 0;
+}
+#last-updated {
+  right: unset;
+  left: 0;
+  translate: 2% 0;
 }
 .set-infos {
   font-family: 'Young Serif', serif;
@@ -789,7 +795,7 @@ kbd.key.enter:before {
     display: revert;
   }
 
-  .hint-controls {
+  .hint-fixed {
     display: none;
   }
 }

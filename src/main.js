@@ -111,6 +111,8 @@ async function getBulkData() {
     credentials: 'include',
     mode: 'no-cors',
   })
+  document.getElementById('last-updated').querySelector('.value').innerText =
+    new Date(response.headers.get('Last-Modified')).toLocaleString()
   const blob = await response.blob()
   const stream = blob.stream()
   const decompressed = stream.pipeThrough(new DecompressionStream('gzip'))
