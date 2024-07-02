@@ -296,9 +296,19 @@
         <kbd class="key enter display-none" style="--key: '↵ Enter'"></kbd>
       </div>
       <div class="hidden" id="result-list">
-        <div class="hidden" id="win-rate">
-          <span id="win-rate-score">0.00%</span>&nbsp;Success Rate
+        <div class="statistics">
+          <div id="win-streak">
+            <div id="win-rate">
+              <span id="win-rate-score">0.00%</span>&nbsp;Success Rate
+            </div>
+
+            <div>Winning Streak:&nbsp;<span id="win-streak-score">0</span></div>
+            <div id="win-streak-longest">
+              Longest:&nbsp;<span id="win-streak-longest-score">0</span>
+            </div>
+          </div>
         </div>
+
         <div class="list-body"></div>
         <template id="list-row">
           <div class="list-item">

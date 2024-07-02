@@ -566,10 +566,16 @@ button:active {
 }
 
 #win-rate {
-  font-size: 2.8rem !important;
+  font-size: 2.8rem;
+  text-align: center;
+}
+#win-streak {
+  font-size: 2rem;
   text-align: center;
 }
 
+#win-streak-score,
+#win-streak-longest-score,
 #win-rate-score {
   color: var(--blue-dark);
 }
@@ -650,7 +656,7 @@ button:active {
   max-height: 100%;
 }
 
-#win-rate,
+.statistics,
 .list-item {
   font-size: 2rem;
   padding: 0 0.5rem;

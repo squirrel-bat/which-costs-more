@@ -62,6 +62,8 @@ const FILTERS = {
 const CARD_DATA = []
 const RESULTS = {
   _cards: [],
+  winStreak: 0,
+  winStreakLongest: 0,
   add(card) {
     this._cards.push(card)
   },
@@ -191,6 +193,12 @@ function evaulateAnswer(id) {
     status: getCardStatus(selectedCard, otherCard),
     versus: { name: otherCard.name, url: otherCard.scryfall_uri },
   }
+  if (resultObject.status == STATUS_FAILURE) RESULTS.winStreak = 0
+  if (resultObject.status == STATUS_SUCCESS) {
+    RESULTS.winStreak++
+    RESULTS.winStreakLongest +=
+      RESULTS.winStreak > RESULTS.winStreakLongest ? 1 : 0
+  }
   RESULTS.add(resultObject)
   return resultObject
 }
@@ -237,6 +245,9 @@ function resultIsActive() {
 
 function updateResultList() {
   document.getElementById('result-list').classList.remove('hidden')
+  document.getElementById('win-streak-score').innerText = RESULTS.winStreak
+  document.getElementById('win-streak-longest-score').innerText =
+    RESULTS.winStreakLongest
   document.getElementById('win-rate-score').innerText =
     (RESULTS.winRate * 100).toFixed(2) + '%'
   document.getElementById('win-rate').classList.remove('hidden')
