@@ -565,13 +565,14 @@ button:active {
   padding: 3rem 0;
 }
 
+.statistics {
+  text-align: center;
+}
 #win-rate {
   font-size: 2.8rem;
-  text-align: center;
 }
 #win-streak {
   font-size: 2rem;
-  text-align: center;
 }
 
 #win-streak-score,
