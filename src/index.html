@@ -77,7 +77,12 @@
               </label>
               <label>
                 Any
-                <input type="radio" name="pricing-type" value="all" />
+                <input
+                  id="price-type-default"
+                  type="radio"
+                  name="pricing-type"
+                  value="all"
+                />
               </label>
               <label>
                 Priciest
@@ -85,8 +90,40 @@
               </label>
             </div>
 
-            <label class="min-price-label" for="min-price-slider">
-              Price Starting At:<span id="min-price-val">
+            <label class="range-label" for="min-price-gap-slider">
+              Minimum Price Gap:<span id="min-price-gap-val" class="range-val">
+                <span class="currency"></span>&nbsp;<span class="value"
+                  >0.00</span
+                >
+              </span>
+            </label>
+            <div class="range-slider">
+              <input
+                type="range"
+                id="min-price-gap-slider"
+                value="0"
+                step=".1"
+                min="0"
+                max="5"
+                draggable="false"
+              />
+              <datalist>
+                <option value="0" label="0.00"></option>
+                <option value=".5"></option>
+                <option value="1" label="1.00"></option>
+                <option value="1.5"></option>
+                <option value="2" label="2.00"></option>
+                <option value="2.5"></option>
+                <option value="3" label="3.00"></option>
+                <option value="3.5"></option>
+                <option value="4" label="4.00"></option>
+                <option value="4.5"></option>
+                <option value="5" label="5.00"></option>
+              </datalist>
+            </div>
+
+            <label class="range-label" for="min-price-slider">
+              Prices Starting At:<span id="min-price-val" class="range-val">
                 <span class="currency"></span>&nbsp;<span class="value"
                   >0.00</span
                 >
@@ -102,7 +139,7 @@
                 max="5"
                 draggable="false"
               />
-              <datalist id="min-price-list">
+              <datalist>
                 <option value="0" label="0.00"></option>
                 <option value=".5"></option>
                 <option value="1" label="1.00"></option>
@@ -152,6 +189,7 @@
                 <div class="toggle"></div>
               </label>
             </div>
+
             <div>Formats:</div>
             <div id="formats" class="toggles">
               <label>

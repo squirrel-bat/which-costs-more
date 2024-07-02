@@ -26,8 +26,9 @@ const DATA_AGGREGATED = {
 }
 const FILTERS = {
   pricingType: 'all',
-  basicLands: true,
+  minimumPriceGap: 0.0,
   minimumPrice: 0.0,
+  basicLands: true,
   rarities: {
     common: true,
     uncommon: true,
@@ -119,11 +120,11 @@ async function getBulkData() {
   return new Response(decompressed).json()
 }
 
-function getRandomCardIndex(butNotThisOne = null) {
-  const index = Math.floor(Math.random() * DATA.length)
+function getRandomCardIndex(butNotThisOne = null, pool) {
+  const data = pool || DATA
+  const index = Math.floor(Math.random() * data.length)
   if (index === butNotThisOne) {
-    console.log("We hit the same card twice!? Let's try that again...")
-    return getRandomCardIndex(butNotThisOne)
+    return getRandomCardIndex(butNotThisOne, pool)
   }
   return index
 }
@@ -135,11 +136,12 @@ function replayAnimations(element) {
   })
 }
 
-function loadCard(id = 0, butNotThatIndex) {
+function loadCard(id = 0, butNotThatIndex, limitedPool) {
   const element = document.getElementById('card-' + id)
   const img = element.querySelector('img')
-  const index = getRandomCardIndex(butNotThatIndex)
-  const card = DATA[index]
+  const index = getRandomCardIndex(butNotThatIndex, limitedPool)
+  const data = limitedPool || DATA
+  const card = data[index]
   CARD_DATA[id] = card
   element.classList.add('loading')
   img.addEventListener('load', () => {
@@ -167,11 +169,9 @@ function getCardStatus(selectedCard, otherCard) {
     throw new Error('Missing prices on card objects.')
   }
   const currency = getCurrency()
-  return Number(selectedCard.prices[currency]) >
-    Number(otherCard.prices[currency])
+  return selectedCard.prices[currency] > otherCard.prices[currency]
     ? STATUS_SUCCESS
-    : Number(selectedCard.prices[currency]) ===
-        Number(otherCard.prices[currency])
+    : selectedCard.prices[currency] === otherCard.prices[currency]
       ? STATUS_DRAW
       : STATUS_FAILURE
 }
@@ -212,11 +212,11 @@ function renderPrices() {
   CARD_DATA.forEach((card, i) => {
     if (!card.hasOwnProperty('prices')) return
     const field = document.getElementById('prices-' + i).querySelector('.price')
-    field.textContent = card.prices[Object.keys(MODES).at(MODE)]
+    field.textContent = card.prices[Object.keys(MODES).at(MODE)].toFixed(2)
     const cheatPrices = document.getElementById('cheat-prices-' + i)
     Object.keys(MODES).forEach((currency) => {
       cheatPrices.querySelector('.' + currency + ' .cheat-price').innerText =
-        card.prices[currency]
+        card.prices[currency].toFixed(2)
     })
     if (THE_CODE.active)
       document
@@ -319,7 +319,14 @@ function reset() {
 function setup() {
   activateModeToggle()
   const firstCardIndex = loadCard(0)
-  loadCard(1, firstCardIndex)
+  // limit set to respect price gap
+  const currency = getCurrency()
+  const fromPool = DATA.filter(
+    (card) =>
+      Math.abs(card.prices[currency] - DATA[firstCardIndex].prices[currency]) >=
+      FILTERS.minimumPriceGap,
+  )
+  loadCard(1, firstCardIndex, fromPool.length > 1 ? fromPool : null)
   activateAnswers()
   renderSetInfos()
   renderPrices()
@@ -417,26 +424,38 @@ function wireUpButtons() {
 }
 
 function wireUpSettings() {
+  const minPriceGapSlider = document.getElementById('min-price-gap-slider')
+  minPriceGapSlider.addEventListener('input', (ev) => {
+    document.querySelector('#min-price-gap-val .value').innerText = Number(
+      ev.target.value,
+    ).toFixed(2)
+  })
   const minPriceSlider = document.getElementById('min-price-slider')
   minPriceSlider.addEventListener('input', (ev) => {
     document.querySelector('#min-price-val .value').innerText = Number(
       ev.target.value,
     ).toFixed(2)
   })
-  Array.from(['mouseup', 'touchend']).forEach((ev) =>
-    minPriceSlider.addEventListener(ev, minimumPriceFilterHandler),
-  )
+  Array.from(['mouseup', 'touchend']).forEach((eventName) => {
+    minPriceGapSlider.addEventListener(eventName, minimumPriceGapFilterHandler)
+    minPriceSlider.addEventListener(eventName, minimumPriceFilterHandler)
+  })
   const basicLandsToggle = document.getElementById('toggle-basic-lands')
   basicLandsToggle.checked = FILTERS.basicLands
   basicLandsToggle.addEventListener('click', (ev) => {
     FILTERS.basicLands = ev.target.checked
-    applyFilters()
+    if (!applyFilters(ev)) {
+      ev.target.checked = !ev.target.checked
+      ev.target.click()
+    }
   })
   document.querySelectorAll('#pricing-type input').forEach((radio) => {
     radio.checked = radio.value == FILTERS.pricingType
     radio.addEventListener('click', (ev) => {
       FILTERS.pricingType = ev.target.value
-      applyFilters()
+      if (!applyFilters(ev)) {
+        document.getElementById('price-type-default').click()
+      }
     })
   })
   document.querySelectorAll('#rarities input').forEach((checkbox) => {
@@ -449,32 +468,55 @@ function wireUpSettings() {
   })
 }
 
+function minimumPriceGapFilterHandler(ev) {
+  const value = Number(ev.target.value)
+  if (value == FILTERS.minimumPriceGap) return
+  FILTERS.minimumPriceGap = value
+  if (!applyFilters(ev)) {
+    ev.target.value = 0.0
+    ev.target.dispatchEvent(new Event('input'))
+    minimumPriceGapFilterHandler(ev)
+  }
+}
 function minimumPriceFilterHandler(ev) {
-  const value = ev.target.value
-  if (Number(value) == Number(FILTERS.minimumPrice)) return
+  const value = Number(ev.target.value)
+  if (value == FILTERS.minimumPrice) return
   FILTERS.minimumPrice = value
-  applyFilters()
+  if (!applyFilters(ev)) {
+    ev.target.value = 0.0
+    ev.target.dispatchEvent(new Event('input'))
+    minimumPriceFilterHandler(ev)
+  }
 }
 
 function raritiesFilterHandler(ev) {
   const checked = ev.target.checked
   FILTERS.rarities[ev.target.value] = checked
   keepLastToggleInGroupActive('rarities', checked)
-  applyFilters()
+  if (!applyFilters(ev)) {
+    ev.target.checked = !checked
+    raritiesFilterHandler(ev)
+  }
 }
 
 function formatsFilterHandler(ev) {
   const checked = ev.target.checked
   FILTERS.formats[ev.target.value] = checked
   keepLastToggleInGroupActive('formats', checked)
-  applyFilters()
+  if (!applyFilters(ev)) {
+    ev.target.checked = !checked
+    formatsFilterHandler(ev)
+  }
 }
 
-function applyFilters() {
+function applyFilters(ev) {
+  document
+    .querySelectorAll('.settings-body input')
+    .forEach((input) => input.classList.remove('error'))
   const currency = getCurrency()
   const allFiltersFunc = (el) => {
     return (
-      Number(el.prices[currency]) >= Number(FILTERS.minimumPrice) &&
+      el.prices[currency] >= FILTERS.minimumPrice &&
       isLegal(el.legalities) &&
       (FILTERS.basicLands || !el.isBasicLand) &&
       FILTERS.rarities[el.rarity]
@@ -484,7 +526,12 @@ function applyFilters() {
     FILTERS.pricingType == 'all'
       ? BULK_DATA.filter(allFiltersFunc)
       : DATA_AGGREGATED.byPrice[FILTERS.pricingType].filter(allFiltersFunc)
+  if (DATA.length < 2) {
+    setTimeout(() => ev.target.classList.add('error'), 1)
+    return false
+  }
   reset()
+  return true
 }
 
 function isLegal(cardLegalities) {
@@ -527,6 +574,10 @@ function updateMythicPauperMode() {
 function prepareData(fetchedData) {
   SETS = fetchedData.sets
   BULK_DATA = fetchedData.data.map((card) => {
+    card.prices = {
+      eur: Number(card.prices['eur']),
+      usd: Number(card.prices['usd']),
+    }
     card.isBasicLand = isBasicLand(card.name)
     return card
   })
@@ -535,7 +586,7 @@ function prepareData(fetchedData) {
   const currency = getCurrency()
   let result = { lowest: {}, highest: {} }
   for (const [idx, card] of Object.entries(DATA)) {
-    const price = Number(card.prices[currency])
+    const price = card.prices[currency]
     if (!result.lowest[card.name] || price < result.lowest[card.name].price) {
       result.lowest[card.name] = { index: Number(idx), price }
     }

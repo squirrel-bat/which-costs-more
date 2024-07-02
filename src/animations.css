@@ -122,3 +122,19 @@
     background: #00f;
   }
 }
+@keyframes error {
+  0%,
+  100% {
+    filter: none;
+    scale: 1;
+  }
+  5%,
+  15% {
+    filter: drop-shadow(0 0 0 var(--red)) drop-shadow(0 0 0 var(--red))
+      drop-shadow(0 0 0.5rem var(--red-50));
+    scale: 0.9;
+  }
+  30% {
+    scale: 1;
+  }
+}

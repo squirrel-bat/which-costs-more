@@ -26,6 +26,7 @@
   --blue: rgb(122, 200, 213);
   --green: rgb(50, 205, 50);
   --red: rgb(230, 50, 0);
+  --red-50: rgb(230, 10, 0, 0.5);
   --white: rgb(230, 225, 220);
   --white-10: rgba(230, 225, 220, 0.1);
   --white-20: rgba(230, 225, 220, 0.2);
@@ -195,7 +196,14 @@ a:hover {
 #last-updated {
   right: unset;
   left: 0;
-  translate: 2% 0;
+  translate: 0 0;
+  font-family: system-ui;
+  font-size: 0.75rem;
+  padding-bottom: 0.2em;
+  padding-left: 0.3em;
+  color: var(--black-50);
+  text-shadow: none;
+  text-transform: uppercase;
 }
 .set-infos {
   font-family: 'Young Serif', serif;
@@ -875,7 +883,7 @@ kbd.key.enter:before {
 #settings-button::after {
   content: '↜\00a0New!';
   font-weight: bold;
-  font-size: 0.8em;
+  font-size: 1em;
   color: var(--white);
   padding: 0.1em 0.3em;
   filter: none;
@@ -888,7 +896,7 @@ kbd.key.enter:before {
   position: absolute;
   bottom: 0;
   right: 0;
-  translate: 100% -20%;
+  translate: 100% 0;
   pointer-events: none;
 }
 
@@ -962,18 +970,18 @@ kbd.key.enter:before {
   min-width: 0;
   font-size: 2rem;
 }
-.min-price-label {
+.range-label {
   display: flex;
   gap: 0.5em;
   align-items: end;
 }
-#min-price-val {
+.range-val {
   font-family: 'Young Serif', serif;
   font-weight: normal;
   color: var(--gold-light);
   text-shadow: 0 0.05em var(--brown-50);
 }
-#min-price-val .currency:after {
+.range-val .currency:after {
   content: var(--mode);
 }
 .range-slider {
@@ -1184,6 +1192,13 @@ option:nth-child(odd) {
     0 0.125em var(--gold),
     0 0.125em 0.35em var(--black-50);
   translate: 80%;
+}
+label[class*='range-']:has(+ div > input.error),
+label:has(input.error),
+div:has(> input.error) {
+  animation:
+    notify-shake 3.5s,
+    error 600ms;
 }
 
 #lets-goo {
