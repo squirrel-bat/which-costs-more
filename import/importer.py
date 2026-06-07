@@ -5,22 +5,25 @@ import shutil
 import requests
 
 VERSION = 1.3
+APP_VERSION = 1.4
 HR = "-" * shutil.get_terminal_size().columns
+HEADERS = {"User-Agent": f"WhichCostsMore/{APP_VERSION}", "Accept": "*/*"}
 BULK_URL = "https://api.scryfall.com/bulk-data/default-cards"
 SETS_URL = "https://api.scryfall.com/sets"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "../src/data.gzip")
 GREEN = "\033[92m"
 ENDCOLOR = "\033[0m"
+session = requests.Session()
 
 
 def get_bulk_json():
     print(f"Fetching Bulk URI from {BULK_URL}")
-    res = requests.get(BULK_URL).json()
+    res = session.get(BULK_URL).json()
     print(f"{GREEN}✔ Success{ENDCOLOR}")
     print(
-        f"Fetching Bulk JSON (~ {round(res['size'] / (1024**2), 2)} MiB) from {res['download_uri']}"
+        f"Fetching Bulk JSON (~ {round(res["size"] / (1024**2), 2)} MiB) from {res["download_uri"]}"
     )
-    return requests.get(res["download_uri"]).json()
+    return session.get(res["download_uri"]).json()
 
 
 def parse_data(data_json):
@@ -69,7 +72,7 @@ def is_valid_card(card):
 
 def get_sets_json():
     print(f"{HR}\nFetching Sets JSON from {SETS_URL}")
-    res = requests.get(SETS_URL).json()
+    res = session.get(SETS_URL).json()
     print(f"{GREEN}✔ Success{ENDCOLOR}")
     return res
 
@@ -93,6 +96,7 @@ def write_gzip_file(output_file, data):
 
 
 def main():
+    session.headers.update(HEADERS)
     print(f"{HR}\nBulk Importer v{VERSION}\n{HR}")
     data_json = get_bulk_json()
     print(f"{GREEN}✔ Success{ENDCOLOR}\n{HR}\nRead:    {len(data_json)} cards")
