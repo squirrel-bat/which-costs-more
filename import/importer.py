@@ -21,7 +21,7 @@ def get_bulk_json():
     res = session.get(BULK_URL).json()
     print(f"{GREEN}✔ Success{ENDCOLOR}")
     print(
-        f"Fetching Bulk JSON (~ {round(res["size"] / (1024**2), 2)} MiB) from {res["download_uri"]}"
+        f"Fetching Bulk JSON (~ {round(res['size'] / (1024**2), 2)} MiB) from {res['download_uri']}"
     )
     return session.get(res["download_uri"]).json()
 
