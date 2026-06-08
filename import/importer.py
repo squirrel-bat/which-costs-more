@@ -1,10 +1,11 @@
+import locale
 import gzip
 import json
 import os
 import shutil
 import requests
 
-VERSION = 1.3
+IMPORTER_VERSION = 1.4
 APP_VERSION = 1.4
 HR = "-" * shutil.get_terminal_size().columns
 HEADERS = {"User-Agent": f"WhichCostsMore/{APP_VERSION}", "Accept": "*/*"}
@@ -12,18 +13,23 @@ BULK_URL = "https://api.scryfall.com/bulk-data/default-cards"
 SETS_URL = "https://api.scryfall.com/sets"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "../src/data.gzip")
 GREEN = "\033[92m"
+YELLOW = "\033[33m"
 ENDCOLOR = "\033[0m"
 session = requests.Session()
 
 
 def get_bulk_json():
     print(f"Fetching Bulk URI from {BULK_URL}")
-    res = session.get(BULK_URL).json()
-    print(f"{GREEN}✔ Success{ENDCOLOR}")
+    response = session.get(BULK_URL)
+    print(f"  {YELLOW}{response}{ENDCOLOR}")
+    bulk_info = response.json()
     print(
-        f"Fetching Bulk JSON (~ {round(res['size'] / (1024**2), 2)} MiB) from {res['download_uri']}"
+        f"Fetching Bulk JSON (~ {round(bulk_info['size'] / (1024**2), 2)} MiB) from {bulk_info['download_uri']}"
     )
-    return session.get(res["download_uri"]).json()
+    response = session.get(bulk_info["download_uri"])
+    bulk_data = response.json()
+    print(f"  {YELLOW}{response}{ENDCOLOR}\n  Read:    {len(bulk_data):n} cards")
+    return bulk_data
 
 
 def parse_data(data_json):
@@ -54,7 +60,7 @@ def parse_data(data_json):
         if is_valid_card(card)
     ]
     percent = (len(card_data) / len(data_json)) * 100.0
-    print(f"Ported:  {len(card_data)} cards ({round(percent, 2)}%)")
+    print(f"  Ported:  {len(card_data):n} cards ({round(percent, 2)}%)")
     return card_data
 
 
@@ -71,10 +77,10 @@ def is_valid_card(card):
 
 
 def get_sets_json():
-    print(f"{HR}\nFetching Sets JSON from {SETS_URL}")
-    res = session.get(SETS_URL).json()
-    print(f"{GREEN}✔ Success{ENDCOLOR}")
-    return res
+    print(f"Fetching Sets JSON from {SETS_URL}")
+    response = session.get(SETS_URL)
+    print(f"  {YELLOW}{response}{ENDCOLOR}")
+    return response.json()
 
 
 def parse_sets(sets_json):
@@ -82,7 +88,7 @@ def parse_sets(sets_json):
         {"code": _set["code"].upper(), "icon": _set["icon_svg_uri"]}
         for _set in sets_json["data"]
     ]
-    print(f"Sets found:  {len(sets)}")
+    print(f"  Found:  {len(sets):n} sets")
     return sets
 
 
@@ -91,15 +97,15 @@ def write_gzip_file(output_file, data):
         fp.write(data.encode("utf-8"))
         fp.close()
     print(
-        f"{HR}\nFile (~ {round(os.path.getsize(output_file) / (1024**2), 2)} MiB) written to {os.path.realpath(fp.name)}\n{HR}"
+        f"File (~ {round(os.path.getsize(output_file) / (1024**2), 2)} MiB) written to {os.path.realpath(fp.name)}\n{HR}"
     )
 
 
 def main():
+    locale.setlocale(locale.LC_ALL, "")
     session.headers.update(HEADERS)
-    print(f"{HR}\nBulk Importer v{VERSION}\n{HR}")
+    print(f"{HR}\nBulk Importer v{IMPORTER_VERSION}\n{HR}")
     data_json = get_bulk_json()
-    print(f"{GREEN}✔ Success{ENDCOLOR}\n{HR}\nRead:    {len(data_json)} cards")
     data = parse_data(data_json)
     sets_json = get_sets_json()
     sets = parse_sets(sets_json)
