@@ -5,9 +5,10 @@ import os
 import shutil
 import requests
 
-IMPORTER_VERSION = 1.4
+IMPORTER_VERSION = 1.5
 APP_VERSION = 1.4
 HR = "-" * shutil.get_terminal_size().columns
+INDENT = "    "
 HEADERS = {"User-Agent": f"WhichCostsMore/{APP_VERSION}", "Accept": "*/*"}
 BULK_URL = "https://api.scryfall.com/bulk-data/default-cards"
 SETS_URL = "https://api.scryfall.com/sets"
@@ -19,17 +20,28 @@ session = requests.Session()
 
 
 def get_bulk_json():
-    print(f"Fetching Bulk URI from {BULK_URL}")
+    print(f"➲ Fetching Bulk URI from {BULK_URL}")
     response = session.get(BULK_URL)
-    print(f"  {YELLOW}{response}{ENDCOLOR}")
+    print(f"{INDENT}{YELLOW}{response}{ENDCOLOR}")
     bulk_info = response.json()
     print(
-        f"Fetching Bulk JSON (~ {round(bulk_info['size'] / (1024**2), 2)} MiB) from {bulk_info['download_uri']}"
+        f"➲ Opening Stream of Bulk JSONL (~ {round(bulk_info['compressed_size'] / (1024**2), 2)} MiB) from {bulk_info['jsonl_download_uri']}"
     )
-    response = session.get(bulk_info["download_uri"])
-    bulk_data = response.json()
-    print(f"  {YELLOW}{response}{ENDCOLOR}\n  Read:    {len(bulk_data):n} cards")
+    response = requests.get(bulk_info["jsonl_download_uri"], stream=True)
+    print(f"{INDENT}{YELLOW}{response}{ENDCOLOR}")
+    print(f"➲ Decompressing and parsing JSONL from Stream")
+    bulk_data = parse_compressed_jsonl_stream(response.raw)
+    print(f"{INDENT}Read:    {len(bulk_data):n} cards")
     return bulk_data
+
+
+def parse_compressed_jsonl_stream(raw_stream):
+    parsed_data = []
+    with gzip.GzipFile(fileobj=raw_stream) as stream:
+        for line_bytes in stream:
+            if line_bytes.strip():
+                parsed_data.append(json.loads(line_bytes))
+    return parsed_data
 
 
 def parse_data(data_json):
@@ -60,7 +72,7 @@ def parse_data(data_json):
         if is_valid_card(card)
     ]
     percent = (len(card_data) / len(data_json)) * 100.0
-    print(f"  Ported:  {len(card_data):n} cards ({round(percent, 2)}%)")
+    print(f"{INDENT}Ported:  {len(card_data):n} cards ({round(percent, 2)}%)")
     return card_data
 
 
@@ -77,9 +89,9 @@ def is_valid_card(card):
 
 
 def get_sets_json():
-    print(f"Fetching Sets JSON from {SETS_URL}")
+    print(f"➲ Fetching Sets JSON from {SETS_URL}")
     response = session.get(SETS_URL)
-    print(f"  {YELLOW}{response}{ENDCOLOR}")
+    print(f"{INDENT}{YELLOW}{response}{ENDCOLOR}")
     return response.json()
 
 
@@ -88,7 +100,7 @@ def parse_sets(sets_json):
         {"code": _set["code"].upper(), "icon": _set["icon_svg_uri"]}
         for _set in sets_json["data"]
     ]
-    print(f"  Found:  {len(sets):n} sets")
+    print(f"{INDENT}Found:  {len(sets):n} sets")
     return sets
 
 
@@ -97,7 +109,7 @@ def write_gzip_file(output_file, data):
         fp.write(data.encode("utf-8"))
         fp.close()
     print(
-        f"File (~ {round(os.path.getsize(output_file) / (1024**2), 2)} MiB) written to {os.path.realpath(fp.name)}\n{HR}"
+        f"✅ File (~ {round(os.path.getsize(output_file) / (1024**2), 2)} MiB) written to {os.path.realpath(fp.name)}\n{HR}"
     )
 
 
