@@ -5,8 +5,7 @@ import os
 import shutil
 import requests
 
-IMPORTER_VERSION = 1.5
-APP_VERSION = 1.4
+APP_VERSION = "1.4.1"
 HR = "-" * shutil.get_terminal_size().columns
 INDENT = "    "
 HEADERS = {"User-Agent": f"WhichCostsMore/{APP_VERSION}", "Accept": "*/*"}
@@ -48,7 +47,7 @@ def parse_data(data_json):
     card_data = [
         {
             "name": card["name"],
-            "img_uri": card["image_uris"]["normal"],
+            "img_uri": card["image_uris"]["grid"],
             "scryfall_uri": card["scryfall_uri"],
             "prices": {
                 "usd": card["prices"]["usd"],
@@ -81,7 +80,7 @@ def is_valid_card(card):
         card["prices"]["usd"] is not None
         and card["prices"]["eur"] is not None
         and "image_uris" in card
-        and "normal" in card["image_uris"]
+        and "grid" in card["image_uris"]
         and card["lang"] == "en"
         and card["digital"] is False
         and "paper" in card["games"]
@@ -116,7 +115,7 @@ def write_gzip_file(output_file, data):
 def main():
     locale.setlocale(locale.LC_ALL, "")
     session.headers.update(HEADERS)
-    print(f"{HR}\nBulk Importer v{IMPORTER_VERSION}\n{HR}")
+    print(f"{HR}\nBulk Importer v{APP_VERSION}\n{HR}")
     data_json = get_bulk_json()
     data = parse_data(data_json)
     sets_json = get_sets_json()
